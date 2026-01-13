@@ -1,3 +1,95 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== CSS Variables for Colors ===== */
+:root {
+  --radius: 10px;
+  --background: #ffffff;
+  --foreground: #111111;
+  --primary: #1D92ED;
+  --primary-foreground: #ffffff;
+  --secondary: #414141;
+  --secondary-foreground: #ffffff;
+  --muted: #f5f7fa;
+  --muted-foreground: #6b7280;
+  --accent: #1D92ED;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --error: #ef4444;
+  --error-foreground: #ffffff;
+  --border: #E7E7E7;
+  --input: #e8e8eb;
+  --ring: #93c5fd;
+  --chart-1: #1D92ED;
+  --chart-2: #60a5fa;
+  --chart-3: #93c5fd;
+  --chart-4: #bfdbfe;
+  --chart-5: #dbeafe;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+}
+
+.dark {
+  --background: #0a0e14;
+  --foreground: #f3f4f6;
+  --card: #151a21;
+  --card-foreground: #f3f4f6;
+  --popover: #151a21;
+  --popover-foreground: #f3f4f6;
+  --primary: #1D92ED;
+  --primary-foreground: #ffffff;
+  --secondary: #414141;
+  --secondary-foreground: #ffffff;
+  --muted: #1f2937;
+  --muted-foreground: #9ca3af;
+  --accent: #1D92ED;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --error: #ef4444;
+  --error-foreground: #ffffff;
+  --border: #E7E7E7;
+  --input: #1f2937;
+  --ring: #93c5fd;
+  --chart-1: #1D92ED;
+  --chart-2: #60a5fa;
+  --chart-3: #93c5fd;
+  --chart-4: #bfdbfe;
+  --chart-5: #dbeafe;
+}
+
+/* ===== Base Styles ===== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ===== Utilities Layer ===== */
+@layer utilities {
+  .border-border {
+    border-color: var(--border);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #1D92ED 0%, #1571c1 100%);
+  }
+
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, #414141 0%, #2a2a2a 100%);
+  }
+
+  .bg-gray {
+    background: #f5f7fa;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
