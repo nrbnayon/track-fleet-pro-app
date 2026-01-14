@@ -6,7 +6,6 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   TextInput,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -52,8 +51,8 @@ export default function VerifyOTPPage() {
     <LinearGradient
       colors={["#D0E9FD", "#FFFFFF", "#FFFFFF", "#D0E9FD"]}
       locations={[0.0854, 0.2055, 0.8274, 0.9902]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       className="flex-1"
     >
       <StatusBar style="dark" />
@@ -61,28 +60,24 @@ export default function VerifyOTPPage() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="flex-1 pt-32 px-5">
-            <View className="items-center gap-3 mb-[60px]">
+        <View className="flex-1 items-center justify-center px-5">
+          <View className="w-full max-w-md">
+            <View className="items-center gap-3 mb-14">
               <Image
                 source={require("@/assets/icons/logo.png")}
-                className="w-14 h-[35px]"
+                className="w-20 h-10"
                 resizeMode="contain"
               />
-              <Text className="text-[28px] font-bold text-bluenormal text-center leading-[34px] mt-4">
+              <Text className="text-3xl font-bold text-primary text-center leading-12 mt-3">
                 Enter OTP
               </Text>
-              <Text className="text-sm text-blackblack-400 text-center leading-[20px] px-8">
+              <Text className="text-sm text-secondary text-center leading-5 px-8">
                 we sent a 4 code to your email
                 dani********.com
               </Text>
             </View>
 
-            <View className="flex-row justify-center gap-4 mb-[40px]">
+            <View className="flex-row justify-center gap-4 mb-14">
               {otp.map((digit, index) => (
                 <TextInput
                   key={index}
@@ -93,19 +88,17 @@ export default function VerifyOTPPage() {
                   keyboardType="number-pad"
                   maxLength={1}
                   className={`w-[60px] h-[60px] rounded-[15px] border-2 text-center text-2xl font-bold ${
-                    digit ? "border-bluenormal text-black" : "border-bluenormal text-black"
+                    digit ? "border-primary text-black" : "border-primary text-black"
                   } bg-white`}
-                  // Note: Design shows blue borders for all inputs (or at least active). The image shows all blue borders.
-                  // I'll stick to blue border as default from image.
-                  style={{ lineHeight: 28 }} // Adjust for vertical centering if needed or rely on flex/padding
+                  style={{ lineHeight: 28 }}
                 />
               ))}
             </View>
             
             <View className="flex-row justify-center mb-8">
-                <Text className="text-blackblack-400">Didn't get OTP? </Text>
+                <Text className="text-secondary">Didn't get OTP? </Text>
                 <Pressable onPress={() => console.log('Resend OTP')}>
-                    <Text className="text-bluenormal font-bold">Resend</Text>
+                    <Text className="text-primary font-bold">Resend</Text>
                 </Pressable>
             </View>
 
@@ -113,7 +106,7 @@ export default function VerifyOTPPage() {
               Verify
             </Button>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );

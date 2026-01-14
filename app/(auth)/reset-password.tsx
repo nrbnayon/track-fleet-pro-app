@@ -6,7 +6,6 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { EyeOff, Eye } from "lucide-react-native";
@@ -32,8 +31,8 @@ export default function ResetPasswordPage() {
     <LinearGradient
       colors={["#D0E9FD", "#FFFFFF", "#FFFFFF", "#D0E9FD"]}
       locations={[0.0854, 0.2055, 0.8274, 0.9902]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       className="flex-1"
     >
       <StatusBar style="dark" />
@@ -41,27 +40,23 @@ export default function ResetPasswordPage() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="flex-1 pt-32 px-5">
-             <View className="items-center gap-3 mb-[60px]">
+        <View className="flex-1 items-center justify-center px-5">
+          <View className="w-full max-w-md">
+             <View className="items-center gap-3 mb-14">
               <Image
                 source={require("@/assets/icons/logo.png")}
-                className="w-14 h-[35px]"
+                className="w-20 h-10"
                 resizeMode="contain"
               />
-              <Text className="text-[28px] font-bold text-bluenormal text-center leading-[34px] mt-4">
+              <Text className="text-3xl font-bold text-primary text-center leading-12 mt-3">
                 Create New Password
               </Text>
-              <Text className="text-sm text-blackblack-400 text-center leading-[20px]">
+              <Text className="text-sm text-secondary text-center leading-5">
                 Create a new unique password
               </Text>
             </View>
 
-            <View className="gap-5 mb-[40px]">
+            <View className="gap-5 mb-14">
               <View className="gap-2">
                 <Label>Password</Label>
                 <View className="relative">
@@ -113,7 +108,7 @@ export default function ResetPasswordPage() {
               Reset Password
             </Button>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );

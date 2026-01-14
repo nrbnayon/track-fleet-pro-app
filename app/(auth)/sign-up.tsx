@@ -6,7 +6,6 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { EyeOff, Eye } from "lucide-react-native";
@@ -38,8 +37,8 @@ export default function SignUpPage() {
     <LinearGradient
       colors={["#D0E9FD", "#FFFFFF", "#FFFFFF", "#D0E9FD"]}
       locations={[0.0854, 0.2055, 0.8274, 0.9902]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       className="flex-1"
     >
       <StatusBar style="dark" />
@@ -47,28 +46,24 @@ export default function SignUpPage() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="flex-1 pt-32 px-5">
-            <View className="items-center gap-3 mb-[40px]">
+        <View className="flex-1 items-center justify-center px-5">
+          <View className="w-full max-w-md">
+            <View className="items-center gap-3 mb-10">
               <Image
                 source={require("@/assets/icons/logo.png")}
-                className="w-14 h-[35px]"
+                className="w-20 h-10"
                 resizeMode="contain"
               />
 
-              <Text className="text-[28px] font-bold text-bluenormal text-center leading-[34px] mt-4">
+              <Text className="text-3xl font-bold text-primary text-center leading-12 mt-3">
                 Register New Account
               </Text>
-              <Text className="text-sm text-blackblack-400 text-center leading-[17px]">
+              <Text className="text-sm text-secondary text-center leading-5">
                 Hey! welcome to our app
               </Text>
             </View>
 
-            <View className="gap-5 mb-[40px]">
+            <View className="gap-5 mb-10">
               <View className="gap-3">
                 <Label>Full Name</Label>
                 <Input
@@ -121,7 +116,7 @@ export default function SignUpPage() {
                     onCheckedChange={setAgreeTerms}
                     className="mt-1"
                   />
-                  <Text className="text-sm text-blackblack-500 leading-5 flex-1">
+                  <Text className="text-sm text-secondary leading-5 flex-1">
                     By using the Track Fleet app you agree to our{' '}
                     <Text className="font-bold underline">Terms & Conditions</Text> and{' '}
                     <Text className="font-bold underline">Privacy-Policy</Text>
@@ -133,14 +128,14 @@ export default function SignUpPage() {
               Sign Up
             </Button>
             
-            <View className="flex-row justify-center mt-6 mb-10">
-                <Text className="text-blackblack-400">Already have an account? </Text>
+            <View className="flex-row justify-center mt-6">
+                <Text className="text-secondary">Already have an account? </Text>
                 <Pressable onPress={handleLogin}>
-                    <Text className="text-bluenormal font-bold">Log In</Text>
+                    <Text className="text-primary font-bold">Log In</Text>
                 </Pressable>
             </View>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
