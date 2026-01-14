@@ -6,11 +6,11 @@ import {
   Pressable,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { EyeOff } from "lucide-react-native";
+import { EyeOff, Eye } from "lucide-react-native";
 import { StatusBar } from "expo-status-bar";
+import { router } from "expo-router";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,51 +20,53 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
     console.log("Login clicked", { email, password, rememberMe });
-  };
-
-  const handleForgotPassword = () => {
-    console.log("Forgot password clicked");
+    // router.replace("/(tabs)");
   };
 
   return (
     <LinearGradient
-      colors={["#d0e9fd", "#ffffff", "#ffffff", "#d0e9fd"]}
-      locations={[0.09, 0.21, 0.84, 1]}
+      colors={["#D0E9FD", "#FFFFFF", "#FFFFFF", "#D0E9FD"]}
+      locations={[0.0854, 0.2055, 0.8274, 0.9902]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
       <StatusBar style="dark" />
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="flex-1 pt-14 px-5">
-            <View className="items-center gap-3 mb-[72px]">
+        <View className="flex-1 items-center justify-center px-5">
+          
+          {/* CONTENT WRAPPER */}
+          <View className="w-full max-w-md">
+
+            {/* HEADER */}
+            <View className="items-center gap-3 mb-14">
               <Image
-                source={require("../../assets/icons/logo.svg")}
-                className="w-14 h-[35px]"
+                source={require("@/assets/icons/logo.png")}
+                className="w-20 h-10"
                 resizeMode="contain"
               />
-              <Text className="text-[28px] text-bluenormal text-center leading-[34px]">
+
+              <Text className="text-4xl font-bold text-primary">
                 Log In
               </Text>
-              <Text className="text-sm text-blackblack-400 text-center leading-[17px]">
+
+              <Text className="text-base text-secondary text-center">
                 Login to access your account
               </Text>
             </View>
 
-            <View className="gap-5 mb-[60px]">
-              <View className="gap-3">
-                <Label>Email</Label>
+            {/* FORM */}
+            <View className="gap-5 mb-14">
+              <View className="gap-2">
+                <Label className="text-base text-foreground">Email</Label>
                 <Input
                   value={email}
                   onChangeText={setEmail}
@@ -76,21 +78,30 @@ export default function LoginPage() {
               </View>
 
               <View className="gap-2">
-                <Label>Password</Label>
+                <Label className="text-base text-foreground">Password</Label>
+
                 <View className="relative">
                   <Input
                     value={password}
                     onChangeText={setPassword}
                     placeholder="••••••••••••••••••••"
-                    secureTextEntry
+                    secureTextEntry={!showPassword}
                     className="pr-12"
                   />
-                  <View className="absolute right-4 top-3">
-                    <EyeOff size={20} color="#b5b5b5" />
-                  </View>
+
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-3"
+                  >
+                    {showPassword ? (
+                      <Eye size={20} color="#b5b5b5" />
+                    ) : (
+                      <EyeOff size={20} color="#b5b5b5" />
+                    )}
+                  </Pressable>
                 </View>
 
-                <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center justify-between mt-2">
                   <Pressable
                     onPress={() => setRememberMe(!rememberMe)}
                     className="flex-row items-center gap-2"
@@ -99,11 +110,13 @@ export default function LoginPage() {
                       checked={rememberMe}
                       onCheckedChange={setRememberMe}
                     />
-                    <Text className="text-sm text-[#242424]">Remember me</Text>
+                    <Text className="text-sm text-foreground font-medium">
+                      Remember me
+                    </Text>
                   </Pressable>
 
-                  <Pressable onPress={handleForgotPassword}>
-                    <Text className="text-sm font-medium text-bluenormal">
+                  <Pressable onPress={() => router.push("/(auth)/forgot-password")}>
+                    <Text className="text-sm font-medium text-primary">
                       Forget Password?
                     </Text>
                   </Pressable>
@@ -111,15 +124,25 @@ export default function LoginPage() {
               </View>
             </View>
 
+            {/* BUTTON */}
             <Button onPress={handleLogin} className="w-full">
               Log In
             </Button>
-          </View>
 
-          <View className="items-center pt-5 pb-2">
-            <View className="w-[135px] h-[5px] bg-black rounded-full" />
+            {/* FOOTER */}
+            <View className="flex-row justify-center mt-6">
+              <Text className="text-foreground">
+                Don't have an account?{" "}
+              </Text>
+              <Pressable onPress={() => router.push("/(auth)/sign-up")}>
+                <Text className="text-primary font-bold">
+                  Sign Up
+                </Text>
+              </Pressable>
+            </View>
+
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </LinearGradient>
   );
