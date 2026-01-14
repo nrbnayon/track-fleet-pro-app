@@ -49,6 +49,7 @@ export default function RootLayout() {
     if (isAuthLoading) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    const inPublicGroup = segments[0] === '(public)' as any;
 
     if (isAuthenticated) {
         // If authenticated but in auth pages OR at root, go to tabs
@@ -56,8 +57,8 @@ export default function RootLayout() {
             router.replace('/(tabs)');
         }
     } else {
-        // If NOT authenticated and NOT in auth pages, go to login
-        if (!inAuthGroup) {
+        // If NOT authenticated and NOT in auth pages or public group, go to login
+        if (!inAuthGroup && !inPublicGroup) {
             router.replace('/(auth)/login');
         }
     }
@@ -78,6 +79,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(public)" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="dark" />
       </ThemeProvider>

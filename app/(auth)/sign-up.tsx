@@ -265,8 +265,25 @@ export default function SignUpPage() {
                       />
                       <Text className="text-sm text-secondary leading-5 flex-1">
                         By using the Track Fleet app you agree to our{" "}
-                        <Text className="font-bold underline">Terms & Conditions</Text> and{" "}
-                        <Text className="font-bold underline">Privacy-Policy</Text>
+                        <Text 
+                          className="font-bold underline text-primary"
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            router.push("/(public)/terms" as any);
+                          }}
+                        >
+                          Terms & Conditions
+                        </Text>{" "}
+                        and{" "}
+                        <Text 
+                          className="font-bold underline text-primary"
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            router.push("/(public)/privacy" as any);
+                          }}
+                        >
+                          Privacy-Policy
+                        </Text>
                       </Text>
                     </Pressable>
                     {termsError ? (
