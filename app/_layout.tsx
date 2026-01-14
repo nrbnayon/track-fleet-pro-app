@@ -51,7 +51,7 @@ export default function RootLayout() {
     if (isAuthenticated) {
         // If authenticated but in auth pages OR at root, go to tabs
         if (inAuthGroup) {
-            router.replace('/(tabs)/index');
+            router.replace('/(tabs)');
         }
     } else {
         // If NOT authenticated and NOT in auth pages, go to login

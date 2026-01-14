@@ -37,7 +37,7 @@ const ParcelCard = ({ parcel }: { parcel: any }) => {
             <View className="flex-row justify-between mb-6">
                 <View>
                     <Text className="text-gray-500 text-xs mb-1">Pickup</Text>
-                    <Text className="font-semibold text-gray-800">{parcel.pickup_location.split(',')[0].trim() || 'Unknown'}</Text>
+                    <Text className="font-semibold text-gray-800">{(parcel.pickup_location || '').split(',')[0].trim() || 'Unknown'}</Text>
                 </View>
                 <View>
                      <Text className="text-gray-500 text-xs mb-1 text-right">Date of dispatch</Text>
@@ -50,7 +50,7 @@ const ParcelCard = ({ parcel }: { parcel: any }) => {
              <View className="flex-row justify-between">
                 <View>
                     <Text className="text-gray-500 text-xs mb-1">Destination:</Text>
-                    <Text className="font-semibold text-gray-800">{parcel.delivery_location.split(',')[0].trim() || 'Unknown'}</Text>
+                    <Text className="font-semibold text-gray-800">{(parcel.delivery_location || '').split(',')[0].trim() || 'Unknown'}</Text>
                 </View>
                 <View>
                      <Text className="text-gray-500 text-xs mb-1 text-right">Date of delivery</Text>

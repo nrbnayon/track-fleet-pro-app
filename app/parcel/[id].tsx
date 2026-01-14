@@ -51,7 +51,7 @@ export default function ParcelDetailsScreen() {
                     <View className="items-center">
                          <View className="w-4 h-4 rounded-full bg-blue-500 mb-2 border-2 border-white shadow-sm" />
                          <Text className="text-[10px] text-gray-500 mb-1">{new Date(parcel.createdAt).toLocaleDateString()}</Text>
-                         <Text className="text-xs font-semibold text-gray-800">{parcel.pickup_location?.split(',')[0].trim()}</Text>
+                         <Text className="text-xs font-semibold text-gray-800">{(parcel.pickup_location || '').split(',')[0].trim() || 'Unknown'}</Text>
                     </View>
 
                     {/* Truck Icon (Middle) */}
@@ -65,7 +65,7 @@ export default function ParcelDetailsScreen() {
                          <Text className="text-[10px] text-gray-500 mb-1">
                             {parcel.estimated_delivery ? new Date(parcel.estimated_delivery).toLocaleDateString() : 'Pending'}
                          </Text>
-                         <Text className="text-xs font-semibold text-gray-800">{parcel.delivery_location?.split(',')[0].trim()}</Text>
+                         <Text className="text-xs font-semibold text-gray-800">{(parcel.delivery_location || '').split(',')[0].trim() || 'Unknown'}</Text>
                     </View>
                  </View>
             </View>

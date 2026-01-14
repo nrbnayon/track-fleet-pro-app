@@ -6,7 +6,7 @@ export default function Index() {
 
   // If authenticated, go to tabs
   if (isAuthenticated) {
-    return <Redirect href="/(tabs)/index" />;
+    return <Redirect href="/(tabs)" />;
   }
 
   // If not authenticated, go to login
