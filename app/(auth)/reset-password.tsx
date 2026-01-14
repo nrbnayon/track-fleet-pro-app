@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
       locations={[0.0854, 0.2055, 0.8274, 0.9902]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      className="flex-1"
+      style={{ flex: 1 }}
     >
       <Pressable 
         onPress={() => router.back()} 
@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
+        style={{ flex: 1 }}
       >
         <View className="flex-1 items-center justify-center px-5">
           <View className="w-full max-w-md">
@@ -75,7 +75,7 @@ export default function ResetPasswordPage() {
                   />
                   <Pressable 
                     onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-3"
+                    className="absolute right-4 top-4"
                   >
                     {showPassword ? (
                        <Eye size={20} color="#b5b5b5" />
@@ -98,7 +98,7 @@ export default function ResetPasswordPage() {
                   />
                   <Pressable 
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-3"
+                    className="absolute right-4 top-4"
                   >
                     {showConfirmPassword ? (
                        <Eye size={20} color="#b5b5b5" />

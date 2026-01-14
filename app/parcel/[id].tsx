@@ -1,5 +1,6 @@
 
-import { View, Text, ScrollView, SafeAreaView, Pressable, Platform } from 'react-native';
+import { View, Text, ScrollView, Pressable, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { allParcelsData } from '@/data/parcels';
 import { ArrowLeft, MapPin, Phone, Truck } from 'lucide-react-native';

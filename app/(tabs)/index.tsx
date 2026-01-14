@@ -1,5 +1,6 @@
 
-import { View, Text, SafeAreaView, ScrollView, TextInput, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TextInput, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Search, MapPin, Bell, AlertTriangle, LogOut } from 'lucide-react-native';
