@@ -1,151 +1,298 @@
-
 import { View, Text, ScrollView, Pressable, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
-import { allParcelsData } from '@/data/parcels';
-import { ArrowLeft, MapPin, Phone, Truck } from 'lucide-react-native';
+import { ArrowLeft, MapPin, Phone, Truck, Check } from 'lucide-react-native';
+import { useParcelStore } from '@/store/useParcelStore';
+import { useToastStore } from '@/store/useToastStore';
+import Svg, { Path, G, Defs, Filter, FeFlood, FeColorMatrix, FeOffset, FeGaussianBlur, FeComposite, FeBlend } from 'react-native-svg';
+
+// Custom Truck Icon SVG Component
+function TruckIcon() {
+  return (
+    <Svg width="30" height="34" viewBox="0 0 30 34" fill="none">
+      <Defs>
+        <Filter id="filter0_d_417_2892" x="0" y="0" width="30" height="33.25" filterUnits="userSpaceOnUse">
+          <FeFlood floodOpacity="0" result="BackgroundImageFix"/>
+          <FeColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+          <FeOffset dy="1"/>
+          <FeGaussianBlur stdDeviation="1"/>
+          <FeComposite in2="hardAlpha" operator="out"/>
+          <FeColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+          <FeBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_417_2892"/>
+          <FeBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_417_2892" result="shape"/>
+        </Filter>
+      </Defs>
+      <G filter="url(#filter0_d_417_2892)">
+        <Path d="M28 21.4353C28 24.1704 25.7827 26.3877 23.0476 26.3877H21.3536C20.0613 26.3877 18.8201 26.8928 17.8951 27.7953L15.6494 29.9863C15.2887 30.3379 14.7131 30.3381 14.3525 29.9863L12.1079 27.7958C11.1828 26.893 9.94152 26.3877 8.64899 26.3877H6.95238C4.21726 26.3877 2 24.1704 2 21.4353V5.95238C2 3.21726 4.21726 1 6.95238 1H23.0476C25.7827 1 28 3.21726 28 5.95238V21.4353Z" fill="white"/>
+        <Path d="M20.625 18.25C20.625 19.2855 19.7855 20.125 18.75 20.125C17.7145 20.125 16.875 19.2855 16.875 18.25C16.875 17.2145 17.7145 16.375 18.75 16.375C19.7855 16.375 20.625 17.2145 20.625 18.25Z" stroke="#1D92ED" strokeWidth="1.125"/>
+        <Path d="M13.125 18.25C13.125 19.2855 12.2855 20.125 11.25 20.125C10.2145 20.125 9.375 19.2855 9.375 18.25C9.375 17.2145 10.2145 16.375 11.25 16.375C12.2855 16.375 13.125 17.2145 13.125 18.25Z" stroke="#1D92ED" strokeWidth="1.125"/>
+        <Path d="M16.875 18.25H13.125M7.5 8.125H15C16.0606 8.125 16.591 8.125 16.9205 8.45451C17.25 8.78401 17.25 9.31434 17.25 10.375V16.75M17.625 10H18.976C19.5983 10 19.9094 10 20.1673 10.146C20.4252 10.292 20.5853 10.5588 20.9054 11.0924L22.1794 13.2156C22.3387 13.4811 22.4183 13.6139 22.4592 13.7613C22.5 13.9087 22.5 14.0635 22.5 14.3733V16.375C22.5 17.0759 22.5 17.4264 22.3492 17.6875C22.2505 17.8585 22.1085 18.0005 21.9375 18.0992C21.6764 18.25 21.3259 18.25 20.625 18.25M7.5 14.875V16.375C7.5 17.0759 7.5 17.4264 7.65072 17.6875C7.74946 17.8585 7.89148 18.0005 8.0625 18.0992C8.32356 18.25 8.67403 18.25 9.375 18.25" stroke="#1D92ED" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+        <Path d="M7.5 10.375H12M7.5 12.625H10.5" stroke="#1D92ED" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+      </G>
+    </Svg>
+  );
+}
+
+// CheckCircle Icon Component for Delivered Button
+function CheckCircleIcon() {
+  return (
+    <View style={{ width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: 'white', alignItems: 'center', justifyContent: 'center'}}>
+      <Check size={14} color="white" strokeWidth={3} />
+    </View>
+  );
+}
+
+// Helper function to format date
+const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  } catch {
+    return 'N/A';
+  }
+};
+
+// Helper function to extract location name (last part)
+const getLocationName = (location: string | undefined): string => {
+  if (!location) return 'Unknown';
+  const parts = location.split(',');
+  return parts[parts.length - 2].trim();
+};
 
 export default function ParcelDetailsScreen() {
   const { id } = useLocalSearchParams();
-  const parcel = allParcelsData.find((p) => p.id === id);
+  const { parcels, startTrip, markAsDelivered } = useParcelStore();
+  const { showToast } = useToastStore();
+  
+  const parcel = parcels.find((p) => p.id === id);
 
   if (!parcel) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text>Parcel not found</Text>
+      <View className="flex-1 items-center justify-center bg-gray-50">
+        <Text className="text-gray-500 font-medium text-lg">Parcel not found</Text>
+        <Pressable onPress={() => router.back()} className="mt-4 px-4 py-2 bg-blue-500 rounded-lg">
+          <Text className="text-white">Go Back</Text>
+        </Pressable>
       </View>
     );
   }
 
-  const isDelivered = parcel.parcel_status === 'delivered';
+  const isPending = parcel.parcel_status === 'pending';
   const isOngoing = parcel.parcel_status === 'ongoing';
+  const isDelivered = parcel.parcel_status === 'delivered';
+  const isReturn = parcel.parcel_status === 'return';
+  const isCancelled = parcel.parcel_status === 'cancelled';
+
+  const handleStartTrip = () => {
+    startTrip(parcel.id);
+    showToast('Trip Started Successfully', 'success');
+  };
+
+  const handleMarkAsDelivered = () => {
+    markAsDelivered(parcel.id);
+    showToast('Parcel Marked as Delivered', 'success');
+  };
+
+  // Extract dates
+  const pickupLocationName = getLocationName(parcel.pickup_location);
+  const deliveryLocationName = getLocationName(parcel.delivery_location);
+  const dispatchDate = formatDate(parcel.createdAt);
+  const deliveryDate = formatDate(parcel.estimated_delivery || parcel.actual_delivery);
 
   return (
     <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 40 : 0 }}>
       {/* Header */}
-      <View className="flex-row items-center px-5 py-4">
-        <Pressable onPress={() => router.back()} className="mr-4">
-          <ArrowLeft size={24} color="#111" />
-        </Pressable>
-        <Text className="text-xl font-bold text-gray-900">Delivery Details</Text>
+      <View className="flex-row items-center justify-between px-5 py-4">
+        <View className="flex-row items-center flex-1">
+          <Pressable onPress={() => router.back()} className="mr-3 p-2 -ml-2">
+            <ArrowLeft size={24} color="#000000" />
+          </Pressable>
+          <Text className="text-xl font-bold text-gray-900">Delivery Details</Text>
+        </View>
+        <View className={`px-3 py-1 rounded-full ${isDelivered ? 'bg-green-100' : isOngoing ? 'bg-blue-100' : isPending ? 'bg-yellow-100' : 'bg-red-100'}`}>
+          <Text className={`text-xs font-semibold capitalize ${isDelivered ? 'text-green-700' : isOngoing ? 'text-blue-700' : isPending ? 'text-yellow-700' : 'text-red-700'}`}>
+            {parcel.parcel_status}
+          </Text>
+        </View>
       </View>
 
-      <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 100 }}>
         
-        {/* Track ID Row */}
-        <View className="flex-row justify-between items-center mb-6 mt-2">
-            <Text className="font-semibold text-gray-900 text-base">Track ID:</Text>
-            <Text className="font-bold text-gray-900 text-base">TRIP-2025-{parcel.id.padStart(3, '0')}</Text>
+        {/* Track ID Section */}
+        <View className="px-5 pt-2 pb-6">
+          <View className="flex-row items-center justify-between mb-1">
+            <Text className="text-sm text-gray-600">Track ID:</Text>
+            <Text className="text-lg font-bold text-gray-900">{parcel.tracking_no || 'N/A'}</Text>
+          </View>
         </View>
 
-        {/* Card */}
-        <View className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100 elevation-sm">
+        {/* Timeline Card with Shadow */}
+        <View className="mx-5 mb-6 bg-white rounded-2xl p-6" 
+          style={{
+            shadowColor: '#979393',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 30,
+            elevation: 8,
+          }}>
+          
+          {/* Timeline Header with Dates */}
+          <View className="flex-row items-center justify-between mb-6">
+            <View>
+              <Text className="text-xs text-gray-600 mb-1">{dispatchDate}</Text>
+              <Text className="text-sm font-semibold text-gray-900">{pickupLocationName}</Text>
+            </View>
+            <View>
+              <Text className="text-xs text-gray-600 mb-1 text-right">{deliveryDate}</Text>
+              <Text className="text-sm font-semibold text-gray-900">{deliveryLocationName}</Text>
+            </View>
+          </View>
+
+          {/* Timeline Progress Bar */}
+          <View className="relative mb-8">
+            {/* Background line */}
+            <View className="absolute left-0 right-0 top-1/2 h-0.5 bg-blue-500" style={{ transform: [{ translateY: -1 }] }} />
             
-            {/* Horizontal Timeline */}
-            <View className="mb-8 relative">
-                 {/* Line */}
-                 <View className="absolute top-[14px] left-2 right-2 h-[2px] bg-blue-100" />
-                 <View className="absolute top-[14px] left-2 w-1/2 h-[2px] bg-blue-500" />
-
-                 <View className="flex-row justify-between items-center">
-                    {/* Start Point */}
-                    <View className="items-center">
-                         <View className="w-4 h-4 rounded-full bg-blue-500 mb-2 border-2 border-white shadow-sm" />
-                         <Text className="text-[10px] text-gray-500 mb-1">{new Date(parcel.createdAt).toLocaleDateString()}</Text>
-                         <Text className="text-xs font-semibold text-gray-800">{(parcel.pickup_location || '').split(',')[0].trim() || 'Unknown'}</Text>
-                    </View>
-
-                    {/* Truck Icon (Middle) */}
-                    <View className="bg-white p-1 rounded-full border border-blue-100 shadow-sm z-10">
-                        <Truck size={16} color="#3b82f6" />
-                    </View>
-
-                    {/* End Point */}
-                    <View className="items-center">
-                         <View className="w-4 h-4 rounded-full bg-blue-500 mb-2 border-2 border-white shadow-sm" />
-                         <Text className="text-[10px] text-gray-500 mb-1">
-                            {parcel.estimated_delivery ? new Date(parcel.estimated_delivery).toLocaleDateString() : 'Pending'}
-                         </Text>
-                         <Text className="text-xs font-semibold text-gray-800">{(parcel.delivery_location || '').split(',')[0].trim() || 'Unknown'}</Text>
-                    </View>
-                 </View>
+            {/* Progress dots */}
+            <View className="flex-row justify-between items-center">
+              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
+              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
+              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
+              
+              {/* Truck icon positioned on timeline */}
+              <View className="absolute" style={{ left: '60%', top: -25, transform: [{ translateX: -15 }] }}>
+                <TruckIcon />
+              </View>
+              
+              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
+              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
             </View>
+          </View>
 
-            {/* From Section */}
-            <View className="mb-6">
-                <Text className="text-gray-500 text-sm mb-2">From</Text>
-                <Text className="text-lg font-bold text-gray-900 mb-1">{parcel.senderInfo?.name || 'Unknown Sender'}</Text>
-                
-                <View className="flex-row items-start mb-1">
-                    <MapPin size={14} color="#6b7280" className="mt-1 mr-2" />
-                    <Text className="text-gray-600 text-sm flex-1">{parcel.senderInfo?.address || parcel.pickup_location}</Text>
-                </View>
-                <View className="flex-row items-center">
-                    <Phone size={14} color="#6b7280" className="mr-2" />
-                    <Text className="text-gray-600 text-sm">{parcel.senderInfo?.phone || '000-0000-000'}</Text>
-                </View>
+          {/* From Section */}
+          <View className="mb-6">
+            <Text className="text-xs text-gray-500 mb-2">From</Text>
+            <Text className="text-base font-bold text-gray-900 mb-3">
+              {parcel.senderInfo?.name || parcel.sellerInfo?.name || 'Unknown Sender'}
+            </Text>
+            
+            <View className="flex-row items-start mb-2">
+              <MapPin size={16} color="#6B7280" style={{ marginTop: 2, marginRight: 8 }} />
+              <Text className="text-sm text-gray-700 flex-1">
+                {parcel.pickup_location || parcel.senderInfo?.address || 'Address not available'}
+              </Text>
             </View>
+            
+            {(parcel.senderInfo?.phone || parcel.sellerInfo?.phone) && (
+              <View className="flex-row items-center">
+                <Phone size={16} color="#6B7280" style={{ marginRight: 8 }} />
+                <Text className="text-sm text-gray-700">
+                  {parcel.senderInfo?.phone || parcel.sellerInfo?.phone}
+                </Text>
+              </View>
+            )}
+          </View>
 
-            {/* To Section */}
-            <View className="mb-6">
-                <Text className="text-gray-500 text-sm mb-2">To</Text>
-                <Text className="text-lg font-bold text-gray-900 mb-1">{parcel.receiverInfo?.name || 'Unknown Receiver'}</Text>
-                
-                <View className="flex-row items-start mb-1">
-                    <MapPin size={14} color="#6b7280" className="mt-1 mr-2" />
-                    <Text className="text-gray-600 text-sm flex-1">{parcel.receiverInfo?.address || parcel.delivery_location}</Text>
-                </View>
-                 <View className="flex-row items-center">
-                    <Phone size={14} color="#6b7280" className="mr-2" />
-                    <Text className="text-gray-600 text-sm">{parcel.receiverInfo?.phone || '000-0000-000'}</Text>
-                </View>
+          {/* To Section */}
+          <View className="mb-6">
+            <Text className="text-xs text-gray-500 mb-2">To</Text>
+            <Text className="text-base font-bold text-gray-900 mb-3">
+              {parcel.receiverInfo?.name || 'Unknown Receiver'}
+            </Text>
+            
+            <View className="flex-row items-start mb-2">
+              <MapPin size={16} color="#6B7280" style={{ marginTop: 2, marginRight: 8 }} />
+              <Text className="text-sm text-gray-700 flex-1">
+                {parcel.delivery_location || parcel.receiverInfo?.address || 'Address not available'}
+              </Text>
             </View>
+            
+            {parcel.receiverInfo?.phone && (
+              <View className="flex-row items-center">
+                <Phone size={16} color="#6B7280" style={{ marginRight: 8 }} />
+                <Text className="text-sm text-gray-700">{parcel.receiverInfo.phone}</Text>
+              </View>
+            )}
+          </View>
 
-            {/* Dates Grid */}
-            <View className="border-t border-gray-100 pt-4 flex-row justify-between mb-4">
-                <View>
-                     <Text className="text-gray-500 text-sm mb-1">Date of dispatch</Text>
-                     <Text className="font-bold text-gray-900 text-base">
-                        {new Date(parcel.createdAt).toLocaleDateString()}
-                     </Text>
-                </View>
-                <View className="items-end">
-                     <Text className="text-gray-500 text-sm mb-1">Date of delivery</Text>
-                     <Text className="font-bold text-gray-900 text-base">
-                        {parcel.estimated_delivery ? new Date(parcel.estimated_delivery).toLocaleDateString() : 'Pending'}
-                     </Text>
-                </View>
+          {/* Date Information */}
+          <View className="flex-row justify-between border-t border-gray-100 pt-4 mb-4">
+            <View className="flex-1">
+              <Text className="text-xs text-gray-500 mb-1">Date of dispatch</Text>
+              <Text className="text-sm font-semibold text-gray-900">{dispatchDate}</Text>
             </View>
-
-            {/* Parcel Details Grid */}
-            <View className="flex-row justify-between">
-                <View>
-                     <Text className="text-gray-500 text-sm mb-1">Parcel Type</Text>
-                     <Text className="font-semibold text-gray-900 text-base capitalize">{parcel.parcel_type}</Text>
-                </View>
-                <View className="items-end">
-                     <Text className="text-gray-500 text-sm mb-1">Parcel Weight</Text>
-                     <Text className="font-semibold text-gray-900 text-base">{parcel.parcel_weight} Kg</Text>
-                </View>
+            <View className="flex-1 items-end">
+              <Text className="text-xs text-gray-500 mb-1">
+                {isDelivered ? 'Date of delivery' : 'Estimated delivery'}
+              </Text>
+              <Text className="text-sm font-semibold text-gray-900">{deliveryDate}</Text>
             </View>
+          </View>
 
+          {/* Parcel Details */}
+          <View className="flex-row justify-between border-t border-gray-100 pt-4">
+            <View className="flex-1">
+              <Text className="text-xs text-gray-500 mb-1">Parcel Type</Text>
+              <Text className="text-sm font-semibold text-gray-900 capitalize">
+                {parcel.parcel_type || 'N/A'}
+              </Text>
+            </View>
+            <View className="flex-1 items-end">
+              <Text className="text-xs text-gray-500 mb-1">Parcel Weight</Text>
+              <Text className="text-sm font-semibold text-gray-900">
+                {parcel.parcel_weight ? `${parcel.parcel_weight} Kg` : 'N/A'}
+              </Text>
+            </View>
+          </View>
         </View>
-
-        {isDelivered ? (
-         <View className="bg-green-600 rounded-full py-4 items-center mb-8">
-            <Text className="text-white font-bold text-lg">Delivered</Text>
-         </View>
-        ) : (
-            <Pressable className="bg-green-600 rounded-full py-4 items-center mb-8 shadow-md">
-                <Text className="text-white font-bold text-lg">Delivered</Text>
-            </Pressable>
-        )}
 
       </ScrollView>
+
+      {/* Action Buttons Footer */}
+      <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        {isPending && (
+          <Pressable 
+            onPress={handleStartTrip}
+            className="bg-blue-600 rounded-xl py-4 items-center shadow-md active:bg-blue-700"
+          >
+            <View className="flex-row items-center">
+              <Truck size={20} color="white" className="mr-2" />
+              <Text className="text-white font-bold text-lg">Start Trip</Text>
+            </View>
+          </Pressable>
+        )}
+
+        {isOngoing && (
+          <Pressable 
+            onPress={handleMarkAsDelivered}
+            className="bg-green-600 rounded-xl py-4 items-center shadow-md active:bg-green-700"
+          >
+            <View className="flex-row items-center">
+              <CheckCircleIcon />
+              <Text className="text-white font-bold text-lg ml-2">Mark as Delivered</Text>
+            </View>
+          </Pressable>
+        )}
+
+        {isDelivered && (
+          <View className="bg-gray-100 rounded-xl py-4 items-center">
+            <Text className="text-gray-500 font-bold text-lg">Completed</Text>
+          </View>
+        )}
+        
+        {(isReturn || isCancelled) && (
+          <View className="bg-red-50 rounded-xl py-4 items-center border border-red-100">
+            <Text className="text-red-500 font-bold text-lg capitalize">{parcel.parcel_status}</Text>
+          </View>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
-
 
 // //track-fleet-pro-app\app\parcel\[id].tsx
 // import { View, Text, ScrollView, Pressable, Platform, Alert } from 'react-native';
