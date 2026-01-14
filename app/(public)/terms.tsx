@@ -26,7 +26,7 @@ export default function TermsAndConditions() {
         <View className="px-5 py-4 flex-row items-center">
           <Pressable
             onPress={() => router.back()}
-            className="w-10 h-10 items-center justify-center rounded-full border border-gray-100 bg-white shadow-sm"
+            className="w-10 h-10 items-center justify-center rounded-full border border-gray-100 bg-transparent shadow-sm"
           >
             <ArrowLeft size={20} color="#000" />
           </Pressable>
