@@ -16,15 +16,32 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
+import { useAuthStore } from "@/store/useAuthStore";
+import { Alert, ActivityIndicator } from "react-native";
+
 export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { signIn, isLoading } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = () => {
-    console.log("Login clicked", { email, password, rememberMe });
-    // router.replace("/(tabs)");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      await signIn(email, password);
+      // No need to manually redirect here; _layout.tsx will handle it based on isAuthenticated state change
+    } catch (error) {
+      Alert.alert("Login Failed", "Invalid credentials or network error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -125,8 +142,15 @@ export default function LoginPage() {
             </View>
 
             {/* BUTTON */}
-            <Button onPress={handleLogin} className="w-full">
-              Log In
+            <Button onPress={handleLogin} className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <View className="flex-row items-center justify-center gap-2">
+                  <ActivityIndicator color="white" />
+                  <Text className="text-white font-medium">Logging in...</Text>
+                </View>
+              ) : (
+                "Log In"
+              )}
             </Button>
 
             {/* FOOTER */}

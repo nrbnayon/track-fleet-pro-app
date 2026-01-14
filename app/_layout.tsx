@@ -1,5 +1,5 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import "../global.css"
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -17,7 +18,10 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  
+  const { token, isAuthenticated, checkAuth, isLoading: isAuthLoading } = useAuthStore();
+  const segments = useSegments();
+  const router = useRouter();
+
   // Load Inter font from Google Fonts
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -26,16 +30,40 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
+  // Initial Auth Check
   useEffect(() => {
-    if (fontsLoaded || fontError) {
-      // Hide the splash screen after the fonts have loaded (or an error was returned) and the UI is ready.
+    checkAuth();
+  }, []);
+
+  // Hide Splash Screen when everything is ready
+  useEffect(() => {
+    if ((fontsLoaded || fontError) && !isAuthLoading) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, isAuthLoading]);
 
-  // Prevent rendering until the font has loaded or an error was returned
-  if (!fontsLoaded && !fontError) {
-    return null;
+  // Auth Protection / Redirection Logic
+  useEffect(() => {
+    if (isAuthLoading) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (isAuthenticated) {
+        // If authenticated but in auth pages OR at root, go to tabs
+        if (inAuthGroup) {
+            router.replace('/(tabs)/index');
+        }
+    } else {
+        // If NOT authenticated and NOT in auth pages, go to login
+        if (!inAuthGroup) {
+            router.replace('/(auth)/login');
+        }
+    }
+  }, [isAuthenticated, segments, isAuthLoading]);
+
+  // Render
+  if ((!fontsLoaded && !fontError) || isAuthLoading) {
+    return null; // Or a custom Loading Screen
   }
 
   return (
@@ -43,7 +71,6 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="dark" />
     </ThemeProvider>

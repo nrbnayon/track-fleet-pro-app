@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { router, useLocalSearchParams } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
 import { Button } from "@/components/ui/button";
 
 export default function VerifyOTPPage() {
@@ -55,6 +56,12 @@ export default function VerifyOTPPage() {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
+      <Pressable 
+        onPress={() => router.back()} 
+        className="absolute top-14 left-5 z-20 w-10 h-10 items-center justify-center rounded-full border border-gray-100 bg-transparent shadow-sm"
+      >
+        <ArrowLeft size={20} color="#000" />
+      </Pressable>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}

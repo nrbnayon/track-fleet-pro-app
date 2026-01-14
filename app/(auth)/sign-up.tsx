@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { EyeOff, Eye } from "lucide-react-native";
+import { EyeOff, Eye, ArrowLeft } from "lucide-react-native";
 import { StatusBar } from "expo-status-bar";
 import { router } from "expo-router";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,12 @@ export default function SignUpPage() {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
+      <Pressable 
+        onPress={() => router.back()} 
+        className="absolute top-14 left-5 z-20 w-10 h-10 items-center justify-center rounded-full border border-gray-100 bg-transparent shadow-sm"
+      >
+        <ArrowLeft size={20} color="#000" />
+      </Pressable>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
