@@ -34,6 +34,8 @@ interface ParcelState {
   setTab: (tab: 'Assigned' | 'Ongoing' | 'Completed') => void;
   setSearchQuery: (query: string) => void;
   getFilteredParcels: () => any[];
+  startTrip: (id: string) => void;
+  markAsDelivered: (id: string) => void;
 }
 
 export const useParcelStore = create<ParcelState>((set, get) => ({
@@ -44,6 +46,9 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
   searchQuery: '',
 
   fetchParcels: async () => {
+    // Only fetch if we haven't fetched yet to preserve local edits during session
+    if (get().parcels.length > 0) return; 
+
     set({ loading: true });
     try {
       // Simulate API Network Request
@@ -52,6 +57,22 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
     } catch (err) {
       set({ error: 'Failed to fetch parcels', loading: false });
     }
+  },
+
+  startTrip: (id: string) => {
+    set((state) => ({
+      parcels: state.parcels.map((p) => 
+        p.id === id ? { ...p, parcel_status: 'ongoing', updatedAt: new Date().toISOString() } : p
+      )
+    }));
+  },
+
+  markAsDelivered: (id: string) => {
+    set((state) => ({
+      parcels: state.parcels.map((p) => 
+        p.id === id ? { ...p, parcel_status: 'delivered', actual_delivery: new Date().toISOString(), updatedAt: new Date().toISOString() } : p
+      )
+    }));
   },
 
   setTab: (tab) => set({ activeTab: tab }),
@@ -65,15 +86,15 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
         let matchesTab = false;
         if (activeTab === 'Assigned') matchesTab = parcel.parcel_status === 'pending';
         if (activeTab === 'Ongoing') matchesTab = parcel.parcel_status === 'ongoing';
-        if (activeTab === 'Completed') matchesTab = parcel.parcel_status === 'delivered' || parcel.parcel_status === 'return';
+        if (activeTab === 'Completed') matchesTab = parcel.parcel_status === 'delivered' || parcel.parcel_status === 'return' || parcel.parcel_status === 'cancelled';
 
         // Search filtering
         const query = searchQuery.toLowerCase();
         const matchesSearch = 
-            parcel.parcel_name.toLowerCase().includes(query) || 
-            parcel.tracking_no.toLowerCase().includes(query) ||
-            parcel.pickup_location?.toLowerCase().includes(query) ||
-            parcel.delivery_location.toLowerCase().includes(query);
+            (parcel.parcel_name && parcel.parcel_name.toLowerCase().includes(query)) || 
+            (parcel.tracking_no && parcel.tracking_no.toLowerCase().includes(query)) ||
+            (parcel.pickup_location && parcel.pickup_location.toLowerCase().includes(query)) ||
+            (parcel.delivery_location && parcel.delivery_location.toLowerCase().includes(query));
 
         return matchesTab && matchesSearch;
     });

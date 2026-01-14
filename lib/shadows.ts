@@ -1,7 +1,19 @@
-// utils/shadows.ts
 import { Platform, ViewStyle } from 'react-native';
 
 export const shadows = {
+  // Main card shadow: box-shadow: 0px 4px 60px 0px #9793934D;
+  card: Platform.select({
+    ios: {
+      shadowColor: '#979393',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3, // 4D in hex = 30% opacity
+      shadowRadius: 30,
+    },
+    android: {
+      elevation: 12,
+    },
+  }) as ViewStyle,
+
   tab: Platform.select({
     ios: {
       shadowColor: '#000000',
@@ -14,18 +26,6 @@ export const shadows = {
     },
   }) as ViewStyle,
 
-  card: Platform.select({
-    ios: {
-      shadowColor: '#000000',
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 0.12,
-      shadowRadius: 30,
-    },
-    android: {
-      elevation: 8,
-    },
-  }) as ViewStyle,
-
   button: Platform.select({
     ios: {
       shadowColor: '#000000',
@@ -35,6 +35,19 @@ export const shadows = {
     },
     android: {
       elevation: 3,
+    },
+  }) as ViewStyle,
+
+  // Truck icon card shadow
+  truckCard: Platform.select({
+    ios: {
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.25,
+      shadowRadius: 2,
+    },
+    android: {
+      elevation: 2,
     },
   }) as ViewStyle,
 };
