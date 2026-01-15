@@ -122,10 +122,10 @@ export const DeliveryCard: React.FC<DeliveryCardProps> = ({ parcel }) => {
             </View>
             <View className="items-end">
               <Text className="text-gray-900 font-semibold text-sm mb-1">
-                Date of delivery
+                {parcel.parcel_status === 'delivered' ? 'Date of delivery' : 'Estimated delivery'}
               </Text>
               <Text className="text-gray-500 text-xs">
-                {formatDateTime(parcel.estimated_delivery)}
+                {formatDateTime(parcel.actual_delivery || parcel.estimated_delivery)}
               </Text>
             </View>
           </View>

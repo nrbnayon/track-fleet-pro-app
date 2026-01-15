@@ -137,7 +137,7 @@ export default function ParcelDetailsScreen() {
   const pickupLocationName = getLocationName(parcel.pickup_location);
   const deliveryLocationName = getLocationName(parcel.delivery_location);
   const dispatchDate = formatDate(parcel.createdAt);
-  const deliveryDate = formatDate(parcel.estimated_delivery || parcel.actual_delivery);
+  const deliveryDate = formatDate(parcel.actual_delivery || parcel.estimated_delivery);
 
   const renderTimelineIcon = () => {
     if (isPending) {
