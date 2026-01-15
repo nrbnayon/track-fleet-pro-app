@@ -36,6 +36,8 @@ interface ParcelState {
   getFilteredParcels: () => any[];
   startTrip: (id: string) => void;
   markAsDelivered: (id: string) => void;
+  acceptOrder: (id: string) => void;
+  rejectOrder: (id: string) => void;
 }
 
 export const useParcelStore = create<ParcelState>((set, get) => ({
@@ -71,6 +73,22 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
     set((state) => ({
       parcels: state.parcels.map((p) => 
         p.id === id ? { ...p, parcel_status: 'delivered', actual_delivery: new Date().toISOString(), updatedAt: new Date().toISOString() } : p
+      )
+    }));
+  },
+
+  acceptOrder: (id: string) => {
+    set((state) => ({
+      parcels: state.parcels.map((p) => 
+        p.id === id ? { ...p, isAccepted: true } : p
+      )
+    }));
+  },
+
+  rejectOrder: (id: string) => {
+    set((state) => ({
+      parcels: state.parcels.map((p) => 
+        p.id === id ? { ...p, parcel_status: 'cancelled', updatedAt: new Date().toISOString() } : p
       )
     }));
   },

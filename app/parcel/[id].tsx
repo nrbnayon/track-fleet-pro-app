@@ -1,8 +1,9 @@
 import { View, Text, ScrollView, Pressable, Platform, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
-import { ArrowLeft, MapPin, Phone, Truck, Check, Info } from 'lucide-react-native';
-import { useState } from 'react';
+import { ArrowLeft, MapPin, Phone, Truck, Check, Info, Box } from 'lucide-react-native';
+import { useState, useEffect, useRef } from 'react';
+import { Animated, Easing } from 'react-native';
 import { useParcelStore } from '@/store/useParcelStore';
 import { useToastStore } from '@/store/useToastStore';
 import Svg, { Path, G, Defs, Filter, FeFlood, FeColorMatrix, FeOffset, FeGaussianBlur, FeComposite, FeBlend } from 'react-native-svg';
@@ -32,6 +33,41 @@ function TruckIcon() {
       </G>
     </Svg>
   );
+}
+
+function DeliveredTruckIcon() {
+  return (
+    <Svg width="30" height="34" viewBox="0 0 30 34" fill="none">
+    <G filter="url(#filter0_d_417_2918)">
+    <Path d="M28 21.4353C28 24.1704 25.7827 26.3877 23.0476 26.3877H21.3536C20.0613 26.3877 18.8201 26.8928 17.8951 27.7953L15.6494 29.9863C15.2887 30.3379 14.7131 30.3381 14.3525 29.9863L12.1079 27.7958C11.1828 26.893 9.94152 26.3877 8.64899 26.3877H6.95238C4.21726 26.3877 2 24.1704 2 21.4353V5.95238C2 3.21726 4.21726 1 6.95238 1H23.0476C25.7827 1 28 3.21726 28 5.95238V21.4353Z" fill="white"/>
+    <Path d="M7.875 10.75V15.25C7.875 18.0784 7.875 19.4927 8.75368 20.3713C9.63236 21.25 11.0466 21.25 13.875 21.25H15M22.125 14.5V10.75" stroke="#1E972C" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M8.90182 9.11096L7.875 10.75H22.125L21.1859 9.18477C20.5456 8.11766 20.2255 7.5841 19.7096 7.29205C19.1938 7 18.5716 7 17.3272 7H12.7153C11.4975 7 10.8886 7 10.3801 7.28147C9.87161 7.56295 9.54835 8.07896 8.90182 9.11096Z" stroke="#1E972C" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M15 10.75V7" stroke="#1E972C" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M13.5 13H16.5" stroke="#1E972C" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M16.875 19.75C16.875 19.75 17.625 19.75 18.375 21.25C18.375 21.25 20.0074 17.5 22.125 16.75" stroke="#1E972C" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+    </G>
+    <Defs>
+    <Filter id="filter0_d_417_2918" x="0" y="0" width="30" height="33.25" filterUnits="userSpaceOnUse">
+    <FeFlood floodOpacity="0" result="BackgroundImageFix"/>
+    <FeColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+    <FeOffset dy="1"/>
+    <FeGaussianBlur stdDeviation="1"/>
+    <FeComposite in2="hardAlpha" operator="out"/>
+    <FeColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+    <FeBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_417_2918"/>
+    <FeBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_417_2918" result="shape"/>
+    </Filter>
+    </Defs>
+    </Svg> 
+  );
+}
+
+function PendingParcelIcon() {
+    return (
+        <View className="bg-blue-500 rounded-full w-[30px] h-[30px] items-center justify-center shadow-sm">
+            <Box size={16} color="white" />
+        </View>
+    );
 }
 
 // CheckCircle Icon Component for Delivered Button
@@ -103,10 +139,9 @@ function RejectOrderModal({ visible, onClose, onConfirm }: { visible: boolean; o
 
 export default function ParcelDetailsScreen() {
   const { id } = useLocalSearchParams();
-  const { parcels, startTrip, markAsDelivered } = useParcelStore();
+  const { parcels, startTrip, markAsDelivered, acceptOrder, rejectOrder } = useParcelStore();
   const { showToast } = useToastStore();
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [hasAccepted, setHasAccepted] = useState(false);
   
   const parcel = parcels.find((p) => p.id === id);
 
@@ -138,15 +173,46 @@ export default function ParcelDetailsScreen() {
   };
 
   const handleAccept = () => {
-    setHasAccepted(true);
+    acceptOrder(parcel.id);
     showToast('Order Accepted', 'success');
   };
 
   const handleRejectConfirm = () => {
+    rejectOrder(parcel.id);
     setShowRejectModal(false);
-    showToast('Order Rejected', 'success'); // In real app, update status
+    showToast('Order Rejected', 'success');
     router.back();
   };
+
+  // Animation for ongoing trip
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (parcel.parcel_status === 'ongoing') {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(progressAnim, {
+            toValue: 1,
+            duration: 8000, 
+            easing: Easing.linear,
+            useNativeDriver: false,
+          }),
+          Animated.timing(progressAnim, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: false,
+          })
+        ])
+      ).start();
+    } else {
+        progressAnim.setValue(parcel.parcel_status === 'delivered' ? 1 : 0);
+    }
+  }, [parcel.parcel_status]);
+
+  const truckLeft = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '90%'], // 0% to 90% container width
+  });
 
   // Extract dates
   const pickupLocationName = getLocationName(parcel.pickup_location);
@@ -204,24 +270,34 @@ export default function ParcelDetailsScreen() {
           </View>
 
           {/* Timeline Progress Bar */}
-          <View className="relative mb-8">
+          <View className="relative mb-8 h-8 justify-center">
             {/* Background line */}
-            <View className="absolute left-0 right-0 top-1/2 h-0.5 bg-blue-500" style={{ transform: [{ translateY: -1 }] }} />
+            <View className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-200" style={{ transform: [{ translateY: -1 }] }} />
             
-            {/* Progress dots */}
-            <View className="flex-row justify-between items-center">
-              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
-              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
-              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
-              
-              {/* Truck icon positioned on timeline */}
-              <View className="absolute" style={{ left: '60%', top: -25, transform: [{ translateX: -15 }] }}>
-                <TruckIcon />
-              </View>
-              
-              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
-              <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
+            {/* Progress dots - simplified for dynamic movement */}
+             <View className="flex-row justify-between items-center w-full absolute top-1/2" style={{ transform: [{ translateY: -6 }] }}>
+              <View className={`w-3 h-3 rounded-full z-10 ${isPending || isOngoing || isDelivered ? 'bg-blue-500' : 'bg-gray-300'}`} />
+              <View className={`w-3 h-3 rounded-full z-10 ${isDelivered ? 'bg-blue-500' : 'bg-gray-300'}`} />
             </View>
+
+            {/* Dynamic Moving Icon */}
+             <Animated.View 
+                className="absolute" 
+                style={{ 
+                    left: isDelivered ? '90%' : isPending ? '0%' : truckLeft, 
+                    top: -18, 
+                    transform: [{ translateX: -15 }],
+                    zIndex: 20
+                }}
+            >
+                {isDelivered ? (
+                    <DeliveredTruckIcon />
+                ) : isOngoing ? (
+                    <TruckIcon />
+                ) : (
+                    <PendingParcelIcon />
+                )}
+            </Animated.View>
           </View>
 
           {/* From Section */}
@@ -305,7 +381,7 @@ export default function ParcelDetailsScreen() {
 
       {/* Action Buttons Footer */}
       <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        {isPending && !hasAccepted && (
+        {isPending && !parcel.isAccepted && (
           <View className="flex-row gap-3">
              <Pressable 
               onPress={() => setShowRejectModal(true)}
@@ -322,7 +398,7 @@ export default function ParcelDetailsScreen() {
           </View>
         )}
 
-        {isPending && hasAccepted && (
+        {isPending && parcel.isAccepted && (
           <Pressable 
             onPress={handleStartTrip}
             className="bg-blue-600 rounded-xl py-4 items-center shadow-md active:bg-blue-700"

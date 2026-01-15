@@ -4,63 +4,63 @@ export interface DriverNotification {
   date: string;
   time: string;
   isRead: boolean;
-  type: 'order_assigned' | 'system';
+  type: 'order_assigned' | 'trip_started' | 'delivered' | 'cancelled';
   parcelId?: string; // Link to a parcel
 }
 
 export const driverNotifications: DriverNotification[] = [
   {
     id: '1',
-    title: 'New order is assigned for you which is close to you location.',
+    title: 'New order #DHL2024001235 is assigned to you.',
     date: 'Today',
-    time: '1 Jan 2026 at 10.10 am',
+    time: '10:10 am',
     isRead: false,
     type: 'order_assigned',
-    parcelId: '1', // Assuming parcel with ID 1 exists
+    parcelId: '2', // Pending
   },
   {
     id: '2',
-    title: 'New order is assigned for you which is close to you location.',
+    title: 'New order #DHL2024001243 is assigned to you.',
     date: 'Today',
-    time: '1 Jan 2026 at 10.10 am',
+    time: '09:45 am',
     isRead: false,
     type: 'order_assigned',
-    parcelId: '2',
+    parcelId: '10', // Pending
   },
   {
     id: '3',
-    title: 'New order is assigned for you which is close to you location.',
+    title: 'Trip started for order #DHL2024001234.',
     date: 'Today',
-    time: '1 Jan 2026 at 10.10 am',
-    isRead: false,
-    type: 'order_assigned',
-    parcelId: '3',
+    time: '08:30 am',
+    isRead: true,
+    type: 'trip_started',
+    parcelId: '1', // Ongoing
   },
   {
     id: '4',
-    title: 'New order is assigned for you which is close to you location.',
+    title: 'Order #DHL2024001239 has been delivered successfully.',
     date: 'Yesterday',
-    time: '1 Jan 2026 at 10.10 am',
+    time: '06:30 pm',
     isRead: true,
-    type: 'order_assigned',
-    parcelId: '4',
+    type: 'delivered',
+    parcelId: '6', // Delivered
   },
   {
     id: '5',
-    title: 'New order is assigned for you which is close to you location.',
+    title: 'New order #DHL2024001238 is assigned to you.',
     date: 'Yesterday',
-    time: '1 Jan 2026 at 10.10 am',
+    time: '04:00 pm',
     isRead: true,
     type: 'order_assigned',
-    parcelId: '5',
+    parcelId: '5', // Pending
   },
   {
     id: '6',
-    title: 'New order is assigned for you which is close to you location.',
+    title: 'Order #DHL2024001236 has been delivered successfully.',
     date: 'Yesterday',
-    time: '1 Jan 2026 at 10.10 am',
+    time: '02:45 pm',
     isRead: true,
-    type: 'order_assigned',
-    parcelId: '6',
+    type: 'delivered',
+    parcelId: '3', // Delivered
   },
 ];
