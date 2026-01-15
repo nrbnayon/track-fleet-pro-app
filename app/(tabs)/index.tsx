@@ -42,11 +42,7 @@ export default function HomeScreen() {
     setShowEmergencyModal(true);
   };
 
-  const handleTurnOnLocation = () => {
-    setShowEmergencyModal(false);
-    // TODO: Implement location permission request
-    console.log('Turn on location');
-  };
+
 
   return (
     <SafeAreaView
@@ -139,7 +135,6 @@ export default function HomeScreen() {
       <EmergencyAlertModal
         visible={showEmergencyModal}
         onClose={() => setShowEmergencyModal(false)}
-        onConfirm={handleTurnOnLocation}
       />
     </SafeAreaView>
   );
