@@ -1,9 +1,9 @@
-// track-fleet-pro-app\components\Home\ParcelCard.tsx
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { shadows } from '@/lib/shadows';
 import { PickupMapPin, DestinationMapPin } from '@/components/icons/MapPinIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface ParcelCardProps {
   parcel: any;
@@ -35,18 +35,47 @@ export const ParcelCard: React.FC<ParcelCardProps> = ({ parcel }) => {
     >
       <View className="mb-4">
         <Text className="text-gray-500 font-medium text-xs">
-          TRIP-2025-{parcel.id.padStart(3, '0')}
+          TRIP-2026-{parcel.id.padStart(3, '0')}
         </Text>
       </View>
 
       <View className="flex-row mb-6">
         {/* Timeline */}
         <View className="mr-4 items-center">
-          <View className="w-8 h-8 bg-blue-50 rounded-full items-center justify-center z-10">
+          <View 
+            className="w-8 h-8 rounded-md items-center justify-center z-10"
+            style={{
+              backgroundColor: '#FFFFFF',
+              shadowColor: '#0A0D12',
+              shadowOffset: { width: 2, height: 2 },
+              shadowOpacity: 0.12,
+              shadowRadius: 10,
+              elevation: 3,
+            }}
+          >
             <PickupMapPin size={20} />
           </View>
-          <View className="w-[2px] bg-blue-200 flex-1 my-[-4px]" />
-          <View className="w-8 h-8 bg-red-50 rounded-full items-center justify-center z-10">
+          <LinearGradient
+            colors={['#609AFE', '#FF4E74']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={{
+              width: 2,
+              flex: 1,
+              marginVertical: -4,
+            }}
+          />
+          <View 
+            className="w-8 h-8 rounded-md items-center justify-center z-10"
+            style={{
+              backgroundColor: '#FFFFFF',
+              shadowColor: '#0A0D12',
+              shadowOffset: { width: 2, height: 2 },
+              shadowOpacity: 0.12,
+              shadowRadius: 10,
+              elevation: 3,
+            }}
+          >
             <DestinationMapPin size={20} />
           </View>
         </View>

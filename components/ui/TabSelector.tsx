@@ -12,7 +12,7 @@ interface TabSelectorProps {
 export const TabSelector: React.FC<TabSelectorProps> = ({ tabs, activeTab, onTabChange }) => {
   return (
     <View 
-      className="flex-row bg-white rounded-full p-1 border border-gray-100"
+      className="flex-row bg-white rounded-full p-2 border border-gray-50"
       style={shadows.tab}
     >
       {tabs.map((tab) => (
@@ -25,7 +25,7 @@ export const TabSelector: React.FC<TabSelectorProps> = ({ tabs, activeTab, onTab
         >
           <Text
             className={`font-medium ${
-              activeTab === tab ? 'text-white' : 'text-gray-600'
+              activeTab === tab ? 'text-white' : 'text-foreground'
             }`}
           >
             {tab}

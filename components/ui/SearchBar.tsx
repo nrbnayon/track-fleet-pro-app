@@ -17,8 +17,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   return (
     <View 
-      className="flex-row items-center bg-white rounded-full px-4 py-3 border border-gray-100"
-      style={shadows.tab}
+      className="flex-row items-center bg-white rounded-full px-4 py-3 border border-[#E7E7E7]"
+      // style={shadows.tab}
     >
       <Search size={20} color="#9ca3af" />
       <TextInput

@@ -65,8 +65,8 @@ export default function HomeScreen() {
               Hello, {user?.name || 'Driver'}
             </Text>
             <View className="flex-row items-center mt-1">
-              <MapPin size={14} color="#6b7280" />
-              <Text className="text-gray-500 ml-1">Shyamoli, Dhaka</Text>
+              <MapPin size={14} color="#414141" />
+              <Text className="text-[#414141] ml-1">Shyamoli, Dhaka</Text>
             </View>
           </View>
           <View className="flex-row items-center gap-3">
@@ -83,7 +83,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        <Text className="text-lg font-semibold text-gray-800 mb-4">
+        <Text className="text-lg font-semibold text-foreground mb-4">
           Deliveries
         </Text>
 

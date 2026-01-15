@@ -4,9 +4,9 @@ export const shadows = {
   // Main card shadow: box-shadow: 0px 4px 60px 0px #9793934D;
   card: Platform.select({
     ios: {
-      shadowColor: '#979393',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3, // 4D in hex = 30% opacity
+      shadowColor: '#000000',
+      shadowOffset: { width: 4, height: 4 },
+      shadowOpacity: 0.12, // 4D in hex = 30% opacity
       shadowRadius: 30,
     },
     android: {
