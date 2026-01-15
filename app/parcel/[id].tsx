@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, Pressable, Platform } from 'react-native';
+import { View, Text, ScrollView, Pressable, Platform, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
-import { ArrowLeft, MapPin, Phone, Truck, Check } from 'lucide-react-native';
+import { ArrowLeft, MapPin, Phone, Truck, Check, Info } from 'lucide-react-native';
+import { useState } from 'react';
 import { useParcelStore } from '@/store/useParcelStore';
 import { useToastStore } from '@/store/useToastStore';
 import Svg, { Path, G, Defs, Filter, FeFlood, FeColorMatrix, FeOffset, FeGaussianBlur, FeComposite, FeBlend } from 'react-native-svg';
@@ -63,10 +64,49 @@ const getLocationName = (location: string | undefined): string => {
   return parts[parts.length - 2].trim();
 };
 
+function RejectOrderModal({ visible, onClose, onConfirm }: { visible: boolean; onClose: () => void; onConfirm: () => void }) {
+  return (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <View className="flex-1 justify-center items-center bg-black/50 px-5">
+        <View className="bg-white rounded-3xl p-6 w-full max-w-sm items-center">
+          <View className="w-12 h-12 rounded-full bg-red-100 items-center justify-center mb-4">
+            <Info size={24} color="#DC2626" />
+          </View>
+          <Text className="text-xl font-bold text-gray-900 mb-2">Reject Order</Text>
+          <Text className="text-gray-500 text-center mb-6">
+            Are you sure you want to reject the order?
+          </Text>
+          <View className="flex-row gap-3 w-full">
+            <Pressable 
+              onPress={onClose}
+              className="flex-1 py-3 rounded-full border border-gray-300 items-center"
+            >
+              <Text className="text-gray-700 font-semibold">Cancel</Text>
+            </Pressable>
+            <Pressable 
+              onPress={onConfirm}
+              className="flex-1 py-3 rounded-full bg-red-600 items-center"
+            >
+              <Text className="text-white font-semibold">Reject</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 export default function ParcelDetailsScreen() {
   const { id } = useLocalSearchParams();
   const { parcels, startTrip, markAsDelivered } = useParcelStore();
   const { showToast } = useToastStore();
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [hasAccepted, setHasAccepted] = useState(false);
   
   const parcel = parcels.find((p) => p.id === id);
 
@@ -95,6 +135,17 @@ export default function ParcelDetailsScreen() {
   const handleMarkAsDelivered = () => {
     markAsDelivered(parcel.id);
     showToast('Parcel Marked as Delivered', 'success');
+  };
+
+  const handleAccept = () => {
+    setHasAccepted(true);
+    showToast('Order Accepted', 'success');
+  };
+
+  const handleRejectConfirm = () => {
+    setShowRejectModal(false);
+    showToast('Order Rejected', 'success'); // In real app, update status
+    router.back();
   };
 
   // Extract dates
@@ -254,7 +305,24 @@ export default function ParcelDetailsScreen() {
 
       {/* Action Buttons Footer */}
       <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        {isPending && (
+        {isPending && !hasAccepted && (
+          <View className="flex-row gap-3">
+             <Pressable 
+              onPress={() => setShowRejectModal(true)}
+              className="flex-1 bg-red-50 py-4 rounded-xl items-center"
+            >
+              <Text className="text-red-500 font-bold text-lg">Reject</Text>
+            </Pressable>
+            <Pressable 
+              onPress={handleAccept}
+              className="flex-1 bg-green-600 py-4 rounded-xl items-center shadow-md active:bg-green-700"
+            >
+              <Text className="text-white font-bold text-lg">Accept</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {isPending && hasAccepted && (
           <Pressable 
             onPress={handleStartTrip}
             className="bg-blue-600 rounded-xl py-4 items-center shadow-md active:bg-blue-700"
@@ -290,6 +358,11 @@ export default function ParcelDetailsScreen() {
           </View>
         )}
       </View>
+      <RejectOrderModal 
+        visible={showRejectModal} 
+        onClose={() => setShowRejectModal(false)}
+        onConfirm={handleRejectConfirm}
+      />
     </SafeAreaView>
   );
 }

@@ -1,6 +1,7 @@
 // app/(tabs)/index.tsx
 import { View, Text, ScrollView, Pressable, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { MapPin, Bell, LogOut } from 'lucide-react-native';
@@ -76,10 +77,13 @@ export default function HomeScreen() {
             >
               <LogOut size={20} color="#ef4444" />
             </Pressable>
-            <View className="relative">
+            <Pressable
+                onPress={() => router.push('/notifications')}
+                className="relative p-1"
+            >
               <Bell size={24} color="#374151" />
-              <View className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
-            </View>
+              <View className="absolute top-0 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white" />
+            </Pressable>
           </View>
         </View>
 
