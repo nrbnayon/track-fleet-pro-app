@@ -199,7 +199,7 @@ export default function ParcelDetailsScreen() {
         
         <View className="px-5 pt-2 pb-6">
           <View className="flex-row items-center justify-between mb-1">
-            <Text className="text-sm text-gray-600">Track ID:</Text>
+            <Text className="text-sm text-secondary">Track ID:</Text>
             <Text className="text-lg font-bold text-gray-900">{parcel.tracking_no || 'N/A'}</Text>
           </View>
         </View>
@@ -215,11 +215,11 @@ export default function ParcelDetailsScreen() {
           
           <View className="flex-row items-center justify-between mb-6">
             <View>
-              <Text className="text-xs text-gray-600 mb-1">{dispatchDate}</Text>
+              <Text className="text-xs text-secondary mb-1">{dispatchDate}</Text>
               <Text className="text-sm font-semibold text-gray-900">{pickupLocationName}</Text>
             </View>
             <View>
-              <Text className="text-xs text-gray-600 mb-1 text-right">{deliveryDate}</Text>
+              <Text className="text-xs text-secondary mb-1 text-right">{deliveryDate}</Text>
               <Text className="text-sm font-semibold text-gray-900">{deliveryLocationName}</Text>
             </View>
           </View>

@@ -29,7 +29,7 @@ export const DeliveryCard: React.FC<DeliveryCardProps> = ({ parcel }) => {
       case 'delivered': return 'bg-green-100 text-green-600';
       case 'ongoing': return 'bg-blue-100 text-blue-600';
       case 'pending': return 'bg-yellow-100 text-yellow-600';
-      default: return 'bg-gray-100 text-gray-600';
+      default: return 'bg-gray-100 text-secondary';
     }
   };
 

@@ -84,7 +84,7 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
             ))}
           </View>
 
-          <Text className="text-gray-600 mb-4 text-base">Or</Text>
+          <Text className="text-secondary mb-4 text-base">Or</Text>
 
           <View className="bg-white border border-gray-200 rounded-xl p-4 h-32 mb-8">
             <TextInput
@@ -161,10 +161,10 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
               <Text className="text-xl font-bold text-foreground text-center mb-2">
                 Emergency Alert Sent
               </Text>
-              <Text className="text-gray-600 text-center mb-1">
+              <Text className="text-secondary text-center mb-1">
                 Admin has been notified
               </Text>
-              <Text className="text-gray-600 text-center">
+              <Text className="text-secondary text-center">
                 Help is on the way
               </Text>
             </View>

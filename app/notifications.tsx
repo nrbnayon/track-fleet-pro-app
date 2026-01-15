@@ -71,7 +71,7 @@ export default function NotificationsScreen() {
         <NotificationTruckIcon />
       </View>
       <View className="flex-1">
-        <Text className={`text-sm leading-5 mb-1 ${!item.isRead ? 'text-gray-900 font-bold' : 'text-gray-600'}`}>
+        <Text className={`text-sm leading-5 mb-1 ${!item.isRead ? 'text-gray-900 font-bold' : 'text-secondary'}`}>
           {item.title}
         </Text>
         <Text className="text-gray-400 text-xs">{item.time}</Text>

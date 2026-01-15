@@ -59,7 +59,7 @@ export const LocationEmergencyAlertModal: React.FC<LocationEmergencyAlertModalPr
           </Text>
 
           {/* Description */}
-          <Text className="text-gray-600 text-center mb-8 leading-6">
+          <Text className="text-secondary text-center mb-8 leading-6">
             You can not turn of your location while on a delivery. Turn it on so that the parcel can be tracked.
           </Text>
 
