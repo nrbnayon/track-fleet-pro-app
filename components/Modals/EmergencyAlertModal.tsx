@@ -1,8 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, Pressable, TextInput, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Modal, Pressable, TextInput, ScrollView, StyleSheet } from 'react-native';
 import { X, AlertTriangle, ArrowLeft } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface EmergencyAlertModalProps {
   visible: boolean;
@@ -23,21 +24,6 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  useEffect(() => {
-    if (showSuccessModal) {
-      timeoutRef.current = setTimeout(() => {
-        handleSuccessDismiss();
-      }, 5000);
-    }
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [showSuccessModal]);
-
   const handleSendPress = () => {
     if (selectedIssue) {
       setShowConfirmModal(true);
@@ -53,9 +39,6 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
   };
 
   const handleSuccessDismiss = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
     setShowSuccessModal(false);
     setSelectedIssue(null);
     setDescription('');
@@ -69,15 +52,15 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
       transparent={false}
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 80 : 20 }}>
+      <SafeAreaView className="flex-1 bg-white">
         {/* Header */}
-        <View className="flex-row items-center px-5 py-4 mt-5">
+        <View className="flex-row items-center px-5 py-4">
           <Pressable onPress={onClose} className="mr-4 p-2 -ml-2">
             <ArrowLeft size={24} color="#1f2937" />
           </Pressable>
         </View>
 
-        <ScrollView className="flex-1 px-5 shadow-lg" contentContainerStyle={{ paddingBottom: 40 }}>
+        <ScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: 40 }}>
           <Text className="text-2xl font-bold text-foreground mb-6">Emergency Alert</Text>
 
           <Text className="text-lg font-semibold text-foreground mb-4">What's the issue?</Text>
@@ -127,14 +110,9 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
           </Pressable>
         </ScrollView>
 
-        {/* Confirmation Modal */}
-        <Modal
-          visible={showConfirmModal}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowConfirmModal(false)}
-        >
-          <View className="flex-1 bg-black/50 justify-center items-center px-5">
+        {/* Confirmation Overlay */}
+        {showConfirmModal && (
+          <View className="absolute inset-0 bg-black/50 justify-center items-center px-5 z-50">
             <View className="bg-white rounded-3xl p-6 w-full max-w-sm">
               <Text className="text-xl font-bold text-foreground text-center mb-2">
                 Send Emergency Alert?
@@ -159,15 +137,11 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
               </View>
             </View>
           </View>
-        </Modal>
+        )}
 
-        {/* Success Modal */}
-        <Modal
-          visible={showSuccessModal}
-          transparent
-          animationType="fade"
-        >
-          <View className="flex-1 bg-black/50 justify-center items-center px-5">
+        {/* Success Overlay */}
+        {showSuccessModal && (
+          <View className="absolute inset-0 bg-black/50 justify-center items-center px-5 z-50">
             <View className="bg-white rounded-3xl p-8 w-full max-w-sm items-center relative">
               {/* Close Button */}
               <Pressable 
@@ -195,8 +169,8 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
               </Text>
             </View>
           </View>
-        </Modal>
-      </View>
+        )}
+      </SafeAreaView>
     </Modal>
   );
 };

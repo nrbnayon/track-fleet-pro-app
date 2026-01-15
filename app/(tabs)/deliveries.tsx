@@ -34,7 +34,7 @@ export default function DeliveriesScreen() {
     <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 40 : 0 }}>
       {/* Header */}
       <View className="flex-row items-center px-5 py-4 mb-2">
-        <Pressable onPress={() => router.back()} className="absolute top-14 left-5 z-20 w-10 h-10 items-center justify-center rounded-full border border-gray-100 bg-transparent shadow-sm">
+        <Pressable onPress={() => router.back()} className="mr-3">
           <ArrowLeft size={24} color="#1f2937" />
         </Pressable>
         <Text className="text-2xl font-bold text-gray-900">My Deliveries</Text>

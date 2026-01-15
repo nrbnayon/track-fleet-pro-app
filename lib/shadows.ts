@@ -4,13 +4,14 @@ export const shadows = {
   // Main card shadow: box-shadow: 0px 4px 60px 0px #9793934D;
   card: Platform.select({
     ios: {
-      shadowColor: '#000000',
-      shadowOffset: { width: 4, height: 4 },
-      shadowOpacity: 0.12, // 4D in hex = 30% opacity
-      shadowRadius: 30,
+      shadowColor: '#979393',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3, 
+      shadowRadius: 30, // 60px blur is very large, 30 is a reasonable RN approximation
     },
     android: {
-      elevation: 12,
+      elevation: 10,
+      shadowColor: '#979393',
     },
   }) as ViewStyle,
 

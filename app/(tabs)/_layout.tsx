@@ -26,7 +26,7 @@ export default function TabLayout() {
             shadowOffset: { width: 0, height: 0 },
             shadowOpacity: 0.16, // roughly 0x29 / 255
             shadowRadius: 51,
-            backgroundColor: Colors[colorScheme ?? 'light'].background, // Ensure background is set
+            backgroundColor: '#ffffff', // Force white background
           },
           default: {
             borderTopWidth: 0,
@@ -70,7 +70,7 @@ export default function TabLayout() {
           tabBarLabel: ({ color, focused }) => (
             <Text style={{ color, fontSize: 10, fontWeight: focused ? 'bold' : '400', marginBottom: 5 }}>Profile</Text>
           ),
-          tabBarIcon: ({ color, focused }) => <User size={28} color={color} />,
+          tabBarIcon: ({ color, focused }) => <User size={28} color={color} fill={focused ? color : 'transparent'} />,
         }}
       />
        <Tabs.Screen
@@ -80,7 +80,7 @@ export default function TabLayout() {
           tabBarLabel: ({ color, focused }) => (
             <Text style={{ color, fontSize: 10, fontWeight: focused ? 'bold' : '400', marginBottom: 5 }}>Contact</Text>
           ),
-          tabBarIcon: ({ color, focused }) => <Phone size={28} color={color} />,
+          tabBarIcon: ({ color, focused }) => <Phone size={28} color={color} fill={focused ? color : 'transparent'} />,
         }}
       />
     </Tabs>
