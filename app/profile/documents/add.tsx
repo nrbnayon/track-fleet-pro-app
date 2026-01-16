@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, CloudUpload, FileText, X } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -83,6 +83,10 @@ export default function AddDocumentScreen() {
             <Text className="text-2xl font-bold text-foreground">Add Documents</Text>
         </View>
 
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
         <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}>
             
             {/* Document Title Input */}
@@ -132,7 +136,7 @@ export default function AddDocumentScreen() {
         </ScrollView>
         
          {/* Footer Buttons */}
-         <View className="absolute bottom-10 left-0 right-0 px-5 flex-row gap-4">
+         <View className="px-5 pb-5 pt-2 flex-row gap-4 bg-white">
              <Pressable 
                 onPress={() => router.back()}
                 className="flex-1 py-4 rounded-full border border-gray-300 items-center"
@@ -149,6 +153,7 @@ export default function AddDocumentScreen() {
                 <Text className="text-white font-bold text-lg">Add</Text>
              </Pressable>
         </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

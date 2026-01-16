@@ -126,6 +126,11 @@ export default function ProfileScreen() {
                     icon={<Settings size={22} color="#414141" />} 
                     label="Account Settings" 
                     onPress={() => router.push('/profile/account')}
+                      />
+                <SettingItem 
+                    icon={<FileText size={22} color="#414141" />} 
+                    label="Documents" 
+                    onPress={() => router.push('/profile/documents' as any)}
                 />
                 
                 <View className="flex-row items-center py-3">
@@ -158,11 +163,6 @@ export default function ProfileScreen() {
                     icon={<ShieldCheck size={22} color="#414141" />} 
                     label="Privacy & Security" 
                     onPress={() => router.push('/(public)/privacy')} 
-                />
-                <SettingItem 
-                    icon={<FileText size={22} color="#414141" />} 
-                    label="Documents" 
-                    onPress={() => router.push('/profile/documents' as any)}
                 />
                 <SettingItem 
                     icon={<Globe size={22} color="#414141" />} 
