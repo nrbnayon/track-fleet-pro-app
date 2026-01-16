@@ -15,14 +15,16 @@ import {
   Globe, 
   LogOut, 
   ChevronRight,
-  Package,
   Clock,
   Trash2,
-  Bell
+  Bell,
+  PackageCheck,
+  Lock
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { shadows } from '@/lib/shadows';
 import { useAuthStore } from '@/store/useAuthStore';
+import { DeliveryTruckIcon } from '@/components/icons/DeliveryIcons';
 
 // Placeholder image for user
 const USER_IMAGE = 'https://i.pravatar.cc/300';
@@ -76,7 +78,7 @@ export default function ProfileScreen() {
                 <View className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
             </View>
             <Text className="text-xl font-bold text-foreground mt-3">Jack Verner</Text>
-            <Text className="text-gray-500 text-center px-10 text-sm mt-1">
+            <Text className="text-secondary text-center px-10 text-sm mt-1">
                 Lorem ipsum dolor sit amet consectetur. Magna lacinia id faucibus erat.
             </Text>
         </View>
@@ -95,19 +97,19 @@ export default function ProfileScreen() {
         </View>
 
         {/* Performance Stats */}
-        <View className="mx-5 mb-6">
-            <Text className="text-lg font-bold text-foreground mb-4">Performance Stats</Text>
-            <View className="flex-row gap-4">
-                <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs border border-gray-100 h-40">
-                    <View className="w-10 h-10 rounded-full bg-green-100 items-center justify-center mb-2">
-                        <Package size={20} color="#22C55E" />
+        <View className="mx-5 mb-6 bg-white rounded-2xl px-5 py-8 mt-5" style={shadows.card}>
+            <Text className="text-lg font-bold text-foreground mb-5">Performance Stats</Text>
+                  <View className="flex-row gap-4">
+                <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs h-40" style={shadows.box}>
+                    <View className="w-10 h-10 rounded-full bg-[#1E972C33] items-center justify-center mb-2">
+                        <PackageCheck size={20} color="#1E972C" />
                     </View>
                     <Text className="text-2xl font-bold text-foreground">234</Text>
                     <Text className="text-gray-500 text-center text-xs mt-1">Deliveries Completed</Text>
                 </View>
-                <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs border border-gray-100 h-40">
-                    <View className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center mb-2">
-                         <Truck size={20} color="#1D92ED" />
+                <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs h-40" style={shadows.box}>
+                    <View className="w-10 h-10 rounded-full bg-[#1D92ED33] items-center justify-center mb-2">
+                         <DeliveryTruckIcon />
                     </View>
                     <Text className="text-2xl font-bold text-foreground">120</Text>
                     <Text className="text-gray-500 text-center text-xs mt-1">Ongoing Deliveries</Text>
@@ -116,12 +118,12 @@ export default function ProfileScreen() {
         </View>
 
         {/* Settings */}
-        <View className="mx-5 mb-10">
-            <Text className="text-lg font-bold text-gray-800 mb-4">Settings</Text>
+        <View className="mx-5 mb-10 bg-white rounded-2xl px-5 py-8 mt-5" style={shadows.card}>
+            <Text className="text-lg font-bold text-gray-800 mb-5">Settings</Text>
             
             <View className="gap-2">
                 <SettingItem 
-                    icon={<Settings size={22} color="#6B7280" />} 
+                    icon={<Settings size={22} color="#414141" />} 
                     label="Account Settings" 
                     onPress={() => router.push('/profile/account')}
                 />
@@ -129,7 +131,7 @@ export default function ProfileScreen() {
                 <View className="flex-row items-center py-3">
                     <View className="w-8 items-center mr-3">
                          <View className="w-6 h-6 items-center justify-center">
-                            <Clock size={22} color="#6B7280" />
+                            <Clock size={22} color="#414141" />
                          </View>
                     </View>
                     <Text className="text-base text-gray-700 flex-1 font-medium">Activity Status</Text>
@@ -143,23 +145,27 @@ export default function ProfileScreen() {
 
                 {/* Notifications Link - Navigates to app/notifications.tsx if it exists, or just placeholder */}
                 <SettingItem 
-                    icon={<Bell size={22} color="#6B7280" />} 
+                    icon={<Bell size={22} color="#414141" />} 
                     label="Notifications" 
                     onPress={() => router.push('/notifications')} 
                 />
-
                 <SettingItem 
-                    icon={<ShieldCheck size={22} color="#6B7280" />} 
+                    icon={<Lock size={22} color="#414141" />} 
+                    label="Change Password" 
+                    onPress={() => router.push('/profile/change-password')} 
+                />
+                <SettingItem 
+                    icon={<ShieldCheck size={22} color="#414141" />} 
                     label="Privacy & Security" 
                     onPress={() => router.push('/(public)/privacy')} 
                 />
                 <SettingItem 
-                    icon={<FileText size={22} color="#6B7280" />} 
+                    icon={<FileText size={22} color="#414141" />} 
                     label="Documents" 
                     onPress={() => router.push('/profile/documents' as any)}
                 />
                 <SettingItem 
-                    icon={<Globe size={22} color="#6B7280" />} 
+                    icon={<Globe size={22} color="#414141" />} 
                     label="Language" 
                     value="English (Default)"
                     onPress={() => {}} 
@@ -176,7 +182,7 @@ export default function ProfileScreen() {
                 />
 
                 <SettingItem 
-                    icon={<LogOut size={22} color="#6B7280" />} 
+                    icon={<LogOut size={22} color="#414141" />} 
                     label="Logout" 
                     onPress={() => setShowLogoutModal(true)} 
                     hideArrow
@@ -280,7 +286,7 @@ const SettingItem = ({
     value,
     onPress, 
     hideArrow = false,
-    labelColor = 'text-gray-700'
+    labelColor = 'text-[#414141]'
 }: { 
     icon: React.ReactNode, 
     label: string, 

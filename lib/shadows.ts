@@ -15,6 +15,20 @@ export const shadows = {
     },
   }) as ViewStyle,
 
+  box: Platform.select({
+  ios: {
+    shadowColor: '#B3B3B3',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25, 
+    shadowRadius: 12,
+  },
+  android: {
+    elevation: 6,
+    shadowColor: '#B3B3B3',
+  },
+}) as ViewStyle,
+
+
   tab: Platform.select({
     ios: {
       shadowColor: '#000000',
