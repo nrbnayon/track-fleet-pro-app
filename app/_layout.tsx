@@ -11,6 +11,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, ActivityIndicator } from 'react-native';
 import { Toast } from '@/components/ui/Toast';
+import { LocationProvider } from '@/context/LocationContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -77,13 +78,15 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider value={DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(public)" options={{ headerShown: false }} />
-        </Stack>
-        <Toast />
-        <StatusBar style="dark" />
+        <LocationProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(public)" options={{ headerShown: false }} />
+          </Stack>
+          <Toast />
+          <StatusBar style="dark" />
+        </LocationProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

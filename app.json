@@ -9,7 +9,20 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ],
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow Track Fleet Pro to use your location to track delivery progress and driver activity even when the app is in the background.",
+        "NSLocationAlwaysUsageDescription": "Allow Track Fleet Pro to use your location in the background to track real-time activity.",
+        "NSLocationWhenInUseUsageDescription": "Allow Track Fleet Pro to access your location for tracking deliveries.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Track Fleet Pro needs access to your camera to take photos for your profile picture.",
+        "NSPhotoLibraryUsageDescription": "Track Fleet Pro needs access to your photo library to select existing photos for your profile picture.",
+        "NSPhotoLibraryAddUsageDescription": "Track Fleet Pro needs access to save photos to your photo library."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +33,19 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.trackfleetproapp"
+      "package": "com.trackfleetproapp.ltd",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -40,11 +65,35 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Track Fleet Pro to use your location to track delivery progress and driver activity even when the app is in the background.",
+          "locationAlwaysPermission": "Allow Track Fleet Pro to use your location in the background to track real-time activity.",
+          "locationWhenInUsePermission": "Allow Track Fleet Pro to access your location for tracking deliveries.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Track Fleet Pro needs access to your photo library to select existing photos for your profile picture.",
+          "cameraPermission": "Track Fleet Pro needs access to your camera to take photos for your profile picture."
+        }
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8394ea0e-6035-4273-942e-ba81e22fa027"
+      }
+    },
+    "owner": "nayonii"
   }
 }
