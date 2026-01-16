@@ -48,7 +48,24 @@ export function ParcelBoxIcon() {
       </Defs>
       <G filter="url(#filter0_d_box)">
         <Path d="M28 21.4353C28 24.1704 25.7827 26.3877 23.0476 26.3877H21.3536C20.0613 26.3877 18.8201 26.8928 17.8951 27.7953L15.6494 29.9863C15.2887 30.3379 14.7131 30.3381 14.3525 29.9863L12.1079 27.7958C11.1828 26.893 9.94152 26.3877 8.64899 26.3877H6.95238C4.21726 26.3877 2 24.1704 2 21.4353V5.95238C2 3.21726 4.21726 1 6.95238 1H23.0476C25.7827 1 28 3.21726 28 5.95238V21.4353Z" fill="white"/>
-        <Path d="M9.5 11.5L15 8.5L20.5 11.5M15 8.5V14.5M15 8.5L9.5 11.5V17.5L15 20.5L20.5 17.5V11.5L15 8.5Z" stroke="#FFA500" strokeWidth="1.125" strokeLinecap="round" strokeLinejoin="round"/>
+        <Path
+          d="M15 9L20 12L15 15L10 12L15 9Z"
+          stroke="#FFA500"
+          strokeWidth={1.8}
+          strokeLinejoin="round"
+        />
+        <Path
+          d="M10 12V17L15 20L20 17V12"
+          stroke="#FFA500"
+          strokeWidth={1.8}
+          strokeLinejoin="round"
+        />
+        <Path
+          d="M15 15V20"
+          stroke="#FFA500"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+        />
       </G>
     </Svg>
   );

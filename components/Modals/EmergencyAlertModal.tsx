@@ -54,7 +54,7 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
     >
       <SafeAreaView className="flex-1 bg-white">
         {/* Header */}
-        <View className="flex-row items-center px-5 py-4">
+        <View className="flex-row items-center px-5 py-4 mt-2">
           <Pressable onPress={onClose} className="mr-4 p-2 -ml-2">
             <ArrowLeft size={24} color="#1f2937" />
           </Pressable>
