@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   Pressable,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,7 +22,7 @@ export default function PrivacyPolicy() {
       style={{ flex: 1 }}
     >
       <StatusBar style="dark" />
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1}}>
         {/* Header */}
         <View className="px-5 py-4 flex-row items-center">
           <Pressable
@@ -40,7 +41,7 @@ export default function PrivacyPolicy() {
           contentContainerStyle={{ paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
         >
-          <View className="mt-4 bg-white/50 p-6 rounded-3xl border border-white/80 shadow-sm">
+          <View className={`mt-4 p-6 rounded-3xl border border-white/80 shadow-sm ${Platform.OS === 'ios' ? 'bg-white/50' : 'bg-white'}`}>
             <Text className="text-sm text-secondary mb-6 italic">
               Last Updated: January 14, 2026
             </Text>

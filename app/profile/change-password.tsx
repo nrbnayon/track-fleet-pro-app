@@ -100,7 +100,7 @@ export default function ChangePasswordScreen() {
                             }}
                             placeholder="Enter Current Password"
                             secureTextEntry={!showCurrentPassword}
-                            className={`border ${errors.current ? 'border-red-500' : 'border-gray-200'} rounded-xl p-3 text-base text-foreground pr-12`}
+                            className={`border ${errors.current ? 'border-red-500' : 'border-gray-200'} p-3 text-base text-foreground pr-12`}
                         />
                         <Pressable 
                             onPress={() => setShowCurrentPassword(!showCurrentPassword)}
@@ -124,7 +124,7 @@ export default function ChangePasswordScreen() {
                             }}
                             placeholder="Enter New Password"
                             secureTextEntry={!showNewPassword}
-                            className={`border ${errors.new ? 'border-red-500' : 'border-gray-200'} rounded-xl p-3 text-base text-foreground pr-12`}
+                            className={`border ${errors.new ? 'border-red-500' : 'border-gray-200'} p-3 text-base text-foreground pr-12`}
                         />
                         <Pressable 
                             onPress={() => setShowNewPassword(!showNewPassword)}
@@ -148,7 +148,7 @@ export default function ChangePasswordScreen() {
                             }}
                             placeholder="Confirm New Password"
                             secureTextEntry={!showConfirmPassword}
-                            className={`border ${errors.confirm ? 'border-red-500' : 'border-gray-200'} rounded-xl p-3 text-base text-foreground pr-12`}
+                            className={`border ${errors.confirm ? 'border-red-500' : 'border-gray-200'} p-3 text-base text-foreground pr-12`}
                         />
                         <Pressable 
                             onPress={() => setShowConfirmPassword(!showConfirmPassword)}

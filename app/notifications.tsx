@@ -89,7 +89,7 @@ export default function NotificationsScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 40 : 0 }}>
+    <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 5 : 0 }}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100">
         <View className="flex-row items-center">

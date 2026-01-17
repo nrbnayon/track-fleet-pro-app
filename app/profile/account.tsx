@@ -77,7 +77,7 @@ export default function AccountSettingsScreen() {
                         <Input 
                             value={firstName}
                             onChangeText={setFirstName}
-                            className="border border-gray-200 rounded-xl p-3 text-base text-foreground"
+                            className="border border-gray-200 p-3 text-base text-foreground"
                         />
                     </View>
                     <View className="flex-1">
@@ -85,7 +85,7 @@ export default function AccountSettingsScreen() {
                         <Input 
                             value={lastName}
                             onChangeText={setLastName}
-                            className="border border-gray-200 rounded-xl p-3 text-base text-foreground"
+                            className="border border-gray-200 p-3 text-base text-foreground"
                         />
                     </View>
                 </View>
@@ -95,7 +95,7 @@ export default function AccountSettingsScreen() {
                      <Input 
                         value={email}
                         editable={false}
-                        className="border border-gray-200 rounded-xl p-3 text-base text-gray-500 bg-gray-50"
+                        className="border border-gray-200 p-3 text-base text-gray-500 bg-gray-50"
                         keyboardType="email-address"
                     />
                 </View>
@@ -105,7 +105,7 @@ export default function AccountSettingsScreen() {
                      <Input 
                         value={phone}
                         onChangeText={setPhone}
-                        className="border border-gray-200 rounded-xl p-3 text-base text-foreground"
+                        className="border border-gray-200 p-3 text-base text-foreground"
                         keyboardType="phone-pad"
                     />
                 </View>

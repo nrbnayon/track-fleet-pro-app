@@ -48,10 +48,6 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
   // Start background tracking
   const startLocationTracking = async () => {
     try {
-      // In Expo Go, background location usually fails on physical devices or is limited.
-      // We skip the actual startLocationUpdatesAsync call if we detect we are likely in a limited environment 
-      // or if the previous check failed, to prevent the app from crashing.
-      
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
       if (!hasStarted) {
         await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
@@ -69,7 +65,6 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
       }
     } catch (e: any) {
       console.log("Background location tracking failed to start (expected in Expo Go without Custom Dev Client):", e.message);
-      // Do not alert the user repeatedly in dev mode if it fails, just log it.
     }
   };
 
@@ -84,7 +79,7 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
           Alert.alert(
             "Permission Required", 
             "Location permission is required to track deliveries.",
-            [{ text: "Open Settings", onPress: Linking.openSettings }]
+            [{ text: "Open Settings", onPress: () => Linking.openSettings() }]
           );
           return;
         }
@@ -95,15 +90,13 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
 
       // 2. Request Background
       try {
-        // Background permissions on iOS in Expo Go often fail or return undetermined quickly.
         const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
         setPermissionStatus(bgStatus);
 
         if (bgStatus === Location.PermissionStatus.GRANTED) {
           await startLocationTracking();
         } else {
-             // Optional: Alert user if strictly needed, or just proceed with foreground only for dev
-             console.log("Background permission not granted or not supported in this client.");
+          console.log("Background permission not granted or not supported in this client.");
         }
       } catch (err: any) {
         console.log("Error requesting background permissions (expected in Expo Go):", err.message);
@@ -117,25 +110,24 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
   useEffect(() => {
     const init = async () => {
       try {
-          const enabled = await checkLocationServices();
-          if (enabled) {
-            const { status: fgStatus } = await Location.getForegroundPermissionsAsync();
-            
-            if (fgStatus === Location.PermissionStatus.GRANTED) {
-               setPermissionStatus(Location.PermissionStatus.GRANTED);
-               // Try to get background status without forcing a request immediately if checking state
-               const { status: bgStatus } = await Location.getBackgroundPermissionsAsync();
-               if (bgStatus === Location.PermissionStatus.GRANTED) {
-                 startLocationTracking();
-               } else {
-                 requestPermissions();
-               }
+        const enabled = await checkLocationServices();
+        if (enabled) {
+          const { status: fgStatus } = await Location.getForegroundPermissionsAsync();
+          
+          if (fgStatus === Location.PermissionStatus.GRANTED) {
+            setPermissionStatus(Location.PermissionStatus.GRANTED);
+            const { status: bgStatus } = await Location.getBackgroundPermissionsAsync();
+            if (bgStatus === Location.PermissionStatus.GRANTED) {
+              startLocationTracking();
             } else {
-               requestPermissions();
+              requestPermissions();
             }
+          } else {
+            requestPermissions();
           }
+        }
       } catch (error) {
-         console.log("Error during location init:", error);
+        console.log("Error during location init:", error);
       }
     };
     init();
@@ -146,12 +138,11 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
         await checkLocationServices();
         const { status } = await Location.getForegroundPermissionsAsync();
         if (status === Location.PermissionStatus.GRANTED) {
-           setPermissionStatus(Location.PermissionStatus.GRANTED);
-           // Attempt background start if we think we have permissions, but be safe
-           const { status: bgStatus } = await Location.getBackgroundPermissionsAsync();
-           if (bgStatus === Location.PermissionStatus.GRANTED) {
-               startLocationTracking();
-           }
+          setPermissionStatus(Location.PermissionStatus.GRANTED);
+          const { status: bgStatus } = await Location.getBackgroundPermissionsAsync();
+          if (bgStatus === Location.PermissionStatus.GRANTED) {
+            startLocationTracking();
+          }
         }
       }
     });
@@ -166,52 +157,52 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     let subscriber: Location.LocationSubscription | null = null;
 
     const startWatching = async () => {
-       if (permissionStatus === 'granted' && isLocationEnabled) {
-          try {
-            subscriber = await Location.watchPositionAsync(
-               { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
-               (loc) => {
-                  setLocation(loc);
-               }
-            );
-          } catch (e) {
-            console.log("Error watching position", e);
-          }
-       }
+      if (permissionStatus === Location.PermissionStatus.GRANTED && isLocationEnabled) {
+        try {
+          subscriber = await Location.watchPositionAsync(
+            { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
+            (loc) => {
+              setLocation(loc);
+            }
+          );
+        } catch (e) {
+          console.log("Error watching position", e);
+        }
+      }
     };
 
     startWatching();
 
     return () => {
-       if (subscriber) subscriber.remove();
+      if (subscriber) subscriber.remove();
     };
   }, [permissionStatus, isLocationEnabled]);
 
   const handleEnableLocation = async () => {
-     if (Platform.OS === 'android') {
-        try {
-           await Location.enableNetworkProviderAsync();
-           // Re-check immediately
-           checkLocationServices();
-        } catch (e) {
-           Linking.openSettings();
-        }
-     } else {
+    if (Platform.OS === 'android') {
+      try {
+        await Location.enableNetworkProviderAsync();
+        // Re-check immediately
+        checkLocationServices();
+      } catch (e) {
         Linking.openSettings();
-     }
+      }
+    } else {
+      Linking.openSettings();
+    }
   };
 
   return (
     <LocationContext.Provider value={{ location, permissionStatus, isLocationEnabled, requestPermissions, checkLocationServices }}>
-       {children}
-       <LocationEmergencyAlertModal 
-          visible={showLocationModal} 
-          onClose={() => {
-            // Cannot close without enabling
-            checkLocationServices();
-          }} 
-          onConfirm={handleEnableLocation}
-       />
+      {children}
+      <LocationEmergencyAlertModal 
+        visible={showLocationModal} 
+        onClose={() => {
+          // Cannot close without enabling
+          checkLocationServices();
+        }} 
+        onConfirm={handleEnableLocation}
+      />
     </LocationContext.Provider>
   );
 };

@@ -180,7 +180,7 @@ export default function ParcelDetailsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 40 : 0 }}>
+    <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 5 : 0 }}>
       <View className="flex-row items-center justify-between px-5 py-4">
         <View className="flex-row items-center flex-1">
           <Pressable onPress={() => router.back()} className="mr-3 p-2 -ml-2">

@@ -14,7 +14,7 @@ export default function ContactScreen() {
         {/* Header */}
         <View className="px-5">
           <View className="flex-row items-center py-4 gap-4">
-            <Pressable onPress={() => router.back()} className="p-2 -ml-2">
+            <Pressable onPress={() => router.back()} className="px-2 -ml-2">
               <ArrowLeft size={24} color="#1f2937" />
             </Pressable>
           </View>

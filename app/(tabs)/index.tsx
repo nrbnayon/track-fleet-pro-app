@@ -47,7 +47,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView
       className="flex-1 bg-gray-50 pt-8"
-      style={{ paddingTop: Platform.OS === 'android' ? 40 : 0 }}
+      style={{ paddingTop: Platform.OS === 'android' ? 5 : 0 }}
     >
       <StatusBar style="dark" />
       <ScrollView
@@ -67,12 +67,12 @@ export default function HomeScreen() {
             </View>
           </View>
           <View className="flex-row items-center gap-3">
-            <Pressable
+            {/* <Pressable
               onPress={handleLogout}
               className="p-2 bg-gray-100 rounded-full"
             >
               <LogOut size={20} color="#ef4444" />
-            </Pressable>
+            </Pressable> */}
             <Pressable
                 onPress={() => router.push('/notifications')}
                 className="relative p-1"
