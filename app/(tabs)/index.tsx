@@ -1,10 +1,10 @@
 // app/(tabs)/index.tsx
-import { View, Text, ScrollView, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, Platform, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { MapPin, Bell, LogOut } from 'lucide-react-native';
+import { MapPin, Bell, PackageX } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useParcelStore } from '@/store/useParcelStore';
@@ -13,6 +13,7 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { ParcelCard } from '@/components/Home/ParcelCard';
 import { EmergencyAlertModal } from '@/components/Modals/EmergencyAlertModal';
 import { EmergencyButton } from '@/components/ui/EmergencyButton';
+import { ParcelCardSkeleton } from '@/components/ui/SkeletonCard';
 
 export default function HomeScreen() {
   const { user, signOut } = useAuthStore();
@@ -27,6 +28,7 @@ export default function HomeScreen() {
   } = useParcelStore();
 
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchParcels();
@@ -34,9 +36,15 @@ export default function HomeScreen() {
 
   const filteredParcels = getFilteredParcels();
 
-  const handleLogout = async () => {
-    await signOut();
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchParcels();
+    setRefreshing(false);
   };
+
+  // const handleLogout = async () => {
+  //   await signOut();
+  // };
 
   const handleEmergencyAlert = () => {
     setShowEmergencyModal(true);
@@ -54,6 +62,14 @@ export default function HomeScreen() {
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.light.tint}
+            colors={[Colors.light.tint]}
+          />
+        }
       >
         {/* Header */}
         <View className="flex-row justify-between items-start mb-6 mt-4">
@@ -108,20 +124,28 @@ export default function HomeScreen() {
         {/* Parcel List */}
         <View className="gap-4">
           {isParcelsLoading ? (
-            <ActivityIndicator
-              size="large"
-              color={Colors.light.tint}
-              className="mt-10"
-            />
+            <>
+              <ParcelCardSkeleton />
+              <ParcelCardSkeleton />
+              <ParcelCardSkeleton />
+            </>
           ) : (
             <>
               {filteredParcels.map((parcel) => (
                 <ParcelCard key={parcel.id} parcel={parcel} />
               ))}
               {filteredParcels.length === 0 && (
-                <Text className="text-center text-gray-400 mt-10">
-                  No parcels found
-                </Text>
+                <View className="items-center justify-center mt-16">
+                  <View className="w-20 h-20 rounded-full bg-gray-100 items-center justify-center mb-4">
+                    <PackageX size={40} color="#9CA3AF" strokeWidth={1.5} />
+                  </View>
+                  <Text className="text-center text-gray-500 text-base font-medium">
+                    No parcels found
+                  </Text>
+                  <Text className="text-center text-gray-400 text-sm mt-1">
+                    {searchQuery ? 'Try adjusting your search' : 'No deliveries available'}
+                  </Text>
+                </View>
               )}
             </>
           )}

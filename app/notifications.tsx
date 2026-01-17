@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, SectionList, Pressable, Platform, Alert } from 'react-native';
+import { View, Text, SectionList, Pressable, Platform, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { driverNotifications, DriverNotification } from '@/data/driverNotifications';
+import { Colors } from '@/constants/theme';
 
 function NotificationTruckIcon() {
   return (
@@ -16,6 +17,7 @@ function NotificationTruckIcon() {
 
 export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState(driverNotifications);
+  const [refreshing, setRefreshing] = useState(false);
 
   const sections = [
     {
@@ -27,6 +29,16 @@ export default function NotificationsScreen() {
       data: notifications.filter((n) => n.date === 'Yesterday'),
     },
   ];
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Simulate fetching new notifications
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // In a real app, you would fetch notifications from an API here
+    // For now, we'll just reset to the original notifications
+    setNotifications(driverNotifications);
+    setRefreshing(false);
+  };
 
   const handlePress = (notification: DriverNotification) => {
     // Mark as read
@@ -111,6 +123,14 @@ export default function NotificationsScreen() {
         stickySectionHeadersEnabled={false}
         contentContainerStyle={{ paddingBottom: 20 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.light.tint}
+            colors={[Colors.light.tint]}
+          />
+        }
       />
     </SafeAreaView>
   );

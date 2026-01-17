@@ -1,21 +1,30 @@
-import { View, Text, Pressable, Platform, FlatList } from 'react-native';
+import { View, Text, Pressable, Platform, FlatList, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, PackageX } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { useParcelStore } from '@/store/useParcelStore';
 import { DeliveryCard } from '@/components/Deliveries/DeliveryCard';
+import { DeliveryCardSkeleton } from '@/components/ui/SkeletonCard';
+import { Colors } from '@/constants/theme';
 
 export default function DeliveriesScreen() {
-    const { parcels, fetchParcels } = useParcelStore();
+    const { parcels, fetchParcels, loading } = useParcelStore();
     const [activeTab, setActiveTab] = useState<'Active' | 'Delivered'>('Active');
     const [searchQuery, setSearchQuery] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
   
     useEffect(() => {
       fetchParcels();
     }, []);
   
+    const onRefresh = async () => {
+      setRefreshing(true);
+      await fetchParcels();
+      setRefreshing(false);
+    };
+
     const activeDeliveries = parcels.filter(d => 
       d.parcel_status === 'pending' || d.parcel_status === 'ongoing'
     );
@@ -83,22 +92,44 @@ export default function DeliveriesScreen() {
       </View>
 
       {/* List */}
-      <FlatList
-        data={displayedDeliveries}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="px-5 bg-white">
-            <DeliveryCard parcel={item} />
-          </View>
-        )}
-        contentContainerStyle={{ paddingBottom: 70 }}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View className="items-center justify-center mt-10">
-            <Text className="text-gray-400">No deliveries found</Text>
-          </View>
-        }
-      />
+      {loading ? (
+        <View className="px-5">
+          <DeliveryCardSkeleton />
+          <DeliveryCardSkeleton />
+          <DeliveryCardSkeleton />
+        </View>
+      ) : (
+        <FlatList
+          data={displayedDeliveries}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View className="px-5 bg-white">
+              <DeliveryCard parcel={item} />
+            </View>
+          )}
+          contentContainerStyle={{ paddingBottom: 70 }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={Colors.light.tint}
+              colors={[Colors.light.tint]}
+            />
+          }
+          ListEmptyComponent={
+            <View className="items-center justify-center mt-16">
+              <View className="w-20 h-20 rounded-full bg-gray-100 items-center justify-center mb-4">
+                <PackageX size={40} color="#9CA3AF" strokeWidth={1.5} />
+              </View>
+              <Text className="text-gray-500 text-base font-medium">No deliveries found</Text>
+              <Text className="text-center text-gray-400 text-sm mt-1">
+                {searchQuery ? 'Try adjusting your search' : `No ${activeTab.toLowerCase()} deliveries`}
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }

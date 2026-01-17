@@ -12,8 +12,8 @@ interface TabSelectorProps {
 export const TabSelector: React.FC<TabSelectorProps> = ({ tabs, activeTab, onTabChange }) => {
   return (
     <View 
-      className="flex-row bg-white rounded-full p-2 border border-gray-50"
-      style={shadows.tab}
+      className="flex-row bg-white rounded-full p-2 shadow-[4px_4px_16px_0_rgba(0,0,0,0.3)]"
+      // style={shadows.tab}
     >
       {tabs.map((tab) => (
         <Pressable
