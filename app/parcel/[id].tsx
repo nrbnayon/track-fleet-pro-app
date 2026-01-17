@@ -23,8 +23,12 @@ const formatDate = (dateString: string | null | undefined): string => {
 
 const getLocationName = (location: string | undefined): string => {
   if (!location) return 'Unknown';
-  const parts = location.split(',');
-  return parts[parts.length - 2].trim();
+  const parts = location.split(',').filter(part => part.trim());
+  if (parts.length === 0) return 'Unknown';
+  if (parts.length === 1) return parts[0].trim();
+  // Get second-to-last part, or last part if only 2 parts
+  const index = parts.length >= 2 ? parts.length - 2 : parts.length - 1;
+  return parts[index].trim();
 };
 
 function RejectOrderModal({ visible, onClose, onConfirm }: { visible: boolean; onClose: () => void; onConfirm: () => void }) {
@@ -176,7 +180,8 @@ export default function ParcelDetailsScreen() {
       );
     }
     
-    return null;
+    // Return empty View instead of null to prevent Android crash
+    return <View />;
   };
 
   return (

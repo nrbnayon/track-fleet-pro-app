@@ -100,7 +100,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Performance Stats */}
-        <View className="mx-5 mb-6 bg-white rounded-2xl px-5 py-8 mt-5" style={shadows.card}>
+        <View className="mx-5 bg-white rounded-2xl px-5 py-8 my-3" style={shadows.card}>
             <Text className="text-lg font-bold text-foreground mb-5">Performance Stats</Text>
                   <View className="flex-row gap-4">
                 <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs h-40" style={shadows.box}>

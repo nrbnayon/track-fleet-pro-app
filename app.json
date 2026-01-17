@@ -4,7 +4,7 @@
     "slug": "track-fleet-pro-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icons/logo.png",
+    "icon": "./assets/icons/app-icon.png",
     "scheme": "trackfleetproapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -27,9 +27,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/icons/logo.png",
-        "backgroundImage": "./assets/icons/logo.png",
-        "monochromeImage": "./assets/icons/logo.png"
+        "foregroundImage": "./assets/icons/app-icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -49,7 +47,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/icons/logo.png",
+      "favicon": "./assets/icons/app-icon.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -57,7 +55,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/icons/logo.png",
+          "image": "./assets/icons/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",

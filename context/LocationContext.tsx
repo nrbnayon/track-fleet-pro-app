@@ -14,8 +14,22 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   }
   if (data) {
     const { locations } = data as { locations: Location.LocationObject[] };
-    // Log locations for now as we simulate tracking
-    console.log('[Background Location Update]:', locations[0]);
+    const loc = locations[0];
+    // Log detailed background location information
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🔵 [Background Location Update]');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🌍 Latitude:', loc.coords.latitude);
+    console.log('🌍 Longitude:', loc.coords.longitude);
+    console.log('🎯 Accuracy:', loc.coords.accuracy, 'meters');
+    console.log('⏱️  Timestamp:', new Date(loc.timestamp).toLocaleString());
+    if (loc.coords.altitude !== null) {
+      console.log('⛰️  Altitude:', loc.coords.altitude, 'meters');
+    }
+    if (loc.coords.speed !== null) {
+      console.log('🚗 Speed:', (loc.coords.speed * 3.6).toFixed(2), 'km/h');
+    }
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   }
 });
 
@@ -159,10 +173,46 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     const startWatching = async () => {
       if (permissionStatus === Location.PermissionStatus.GRANTED && isLocationEnabled) {
         try {
+          // Get current location immediately
+          const currentLocation = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+          });
+          setLocation(currentLocation);
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          console.log('📍 [Initial Location]');
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          console.log('🌍 Latitude:', currentLocation.coords.latitude);
+          console.log('🌍 Longitude:', currentLocation.coords.longitude);
+          console.log('🎯 Accuracy:', currentLocation.coords.accuracy, 'meters');
+          console.log('⏱️  Timestamp:', new Date(currentLocation.timestamp).toLocaleString());
+          if (currentLocation.coords.altitude !== null) {
+            console.log('⛰️  Altitude:', currentLocation.coords.altitude, 'meters');
+          }
+          if (currentLocation.coords.speed !== null) {
+            console.log('🚗 Speed:', (currentLocation.coords.speed * 3.6).toFixed(2), 'km/h');
+          }
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+          // Start watching for continuous updates
           subscriber = await Location.watchPositionAsync(
             { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
             (loc) => {
               setLocation(loc);
+              // Log detailed location information
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              console.log('📍 [Foreground Location Update]');
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              console.log('🌍 Latitude:', loc.coords.latitude);
+              console.log('🌍 Longitude:', loc.coords.longitude);
+              console.log('🎯 Accuracy:', loc.coords.accuracy, 'meters');
+              console.log('⏱️  Timestamp:', new Date(loc.timestamp).toLocaleString());
+              if (loc.coords.altitude !== null) {
+                console.log('⛰️  Altitude:', loc.coords.altitude, 'meters');
+              }
+              if (loc.coords.speed !== null) {
+                console.log('🚗 Speed:', (loc.coords.speed * 3.6).toFixed(2), 'km/h');
+              }
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
             }
           );
         } catch (e) {
