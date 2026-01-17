@@ -38,7 +38,8 @@ export default function TabLayout() {
             shadowOpacity: 0.16,
             shadowRadius: 51,
             elevation: 5,
-            backgroundColor: Colors[colorScheme ?? 'light'].background,
+            backgroundColor: '#ffffff',
+            // backgroundColor: Colors[colorScheme ?? 'light'].background,
           },
         }),
       }}>

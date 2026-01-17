@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,23 +10,25 @@ export default function ContactScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         {/* Header */}
-        <View className="flex-row items-center py-4 mt-2">
-          <Pressable onPress={() => router.back()} className="p-2 -ml-2">
-            <ArrowLeft size={24} color="#1f2937" />
-          </Pressable>
-        </View>
+        <View className="px-5">
+          <View className="flex-row items-center py-4 gap-4">
+            <Pressable onPress={() => router.back()} className="p-2 -ml-2">
+              <ArrowLeft size={24} color="#1f2937" />
+            </Pressable>
+          </View>
 
-        <View className="mb-8">
-          <Text className="text-2xl font-bold text-foreground mb-1">Contact with Admin</Text>
-          <Text className="text-gray-500 text-base">Get help anytime when you need</Text>
+          <View className="mb-8">
+            <Text className="text-2xl font-bold text-foreground mb-1">Contact with Admin</Text>
+            <Text className="text-gray-500 text-base">Get help anytime when you need</Text>
+          </View>
         </View>
 
         {/* Profile Section */}
         <View className="items-center mb-10">
           <View className="w-25 h-25 rounded-full items-center justify-center mb-4">
-            <CircleUserRound  size={100} color="#111111" strokeWidth={1} />
+            <CircleUserRound size={100} color="#111111" strokeWidth={1} />
           </View>
           <Text className="text-lg font-bold text-foreground mb-2">Admin</Text>
           <Text className="text-gray-500 text-center px-6 leading-5">
@@ -37,7 +38,7 @@ export default function ContactScreen() {
 
         {/* Contact Information Card */}
         <View 
-          className="bg-white rounded-2xl p-6 mb-6 mx-1"
+          className="mx-5 mb-6 bg-white rounded-2xl p-6"
           style={shadows.card}
         >
           <Text className="text-lg font-bold text-secondary mb-6">Contact Information</Text>

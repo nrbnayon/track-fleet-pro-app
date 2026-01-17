@@ -58,14 +58,17 @@ export default function ProfileScreen() {
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
         {/* Header */}
-        <View className="px-5 pt-2 pb-4">
-            <Pressable onPress={() => router.back()} className="p-2 -ml-2 w-10">
+        <View className="px-5">
+        <View className="flex-row items-center py-4 gap-4">
+            <Pressable onPress={() => router.back()} className="p-2 -ml-2">
                 <ArrowLeft size={24} color="#1f2937" />
             </Pressable>
-            <View className="mt-2">
-                <Text className="text-3xl font-bold text-foreground">Profile</Text>
-                <Text className="text-gray-500 text-base">Manage your account and preferences</Text>
-            </View>
+        </View>
+        
+        <View className="mb-8">
+          <Text className="text-2xl font-bold text-foreground mb-1">Profile</Text>
+          <Text className="text-gray-500 text-base">Manage your account and preferences</Text>
+        </View>
         </View>
 
         {/* User Info */}
