@@ -22,7 +22,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const { token, isAuthenticated, checkAuth, isLoading: isAuthLoading } = useAuthStore();
+  const { isAuthenticated, checkAuth, isLoading: isAuthLoading } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
 

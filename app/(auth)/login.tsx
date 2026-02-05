@@ -21,8 +21,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useToastStore } from "@/store/useToastStore";
 
 export default function LoginPage() {
+  const { showToast } = useToastStore();
   const [rememberMe, setRememberMe] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -91,9 +93,24 @@ export default function LoginPage() {
     try {
       setIsSubmitting(true);
       await signIn(email.trim(), password);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      Alert.alert("Login Failed", "Invalid credentials or network error");
+      
+      const errorMessage = error.response?.data?.message || error.message || "Invalid credentials or network error";
+      
+      // If validation errors are present (e.g. 400 with errors object)
+      if (error.response?.data?.errors) {
+          const errors = error.response.data.errors;
+          if (errors.email_address) setEmailError(errors.email_address);
+          if (errors.password) setPasswordError(errors.password);
+          
+          // Also show generic toast
+          showToast(errorMessage, "error");
+      } else {
+          Alert.alert("Login Failed", errorMessage);
+          showToast(errorMessage, "error");
+      }
+
     } finally {
       setIsSubmitting(false);
     }

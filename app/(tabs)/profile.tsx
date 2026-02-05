@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, Switch, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, Pressable, Image, Switch, Modal, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
   ArrowLeft, 
@@ -31,7 +31,7 @@ const USER_IMAGE = 'https://i.pravatar.cc/300';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { signOut } = useAuthStore();
+  const { user, signOut, deleteAccount } = useAuthStore();
   const [isActive, setIsActive] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -44,14 +44,19 @@ export default function ProfileScreen() {
   };
 
   const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    // Simulate API call for account deletion
-    setTimeout(async () => {
-      setIsDeleting(false);
+    try {
+      setIsDeleting(true);
+      await deleteAccount();
       setShowDeleteModal(false);
-      await signOut(); // Sign out after deletion
-      router.replace('/(auth)/login'); // Redirect to login
-    }, 1500);
+      router.replace('/(auth)/login');
+    } catch (error: any) {
+      Alert.alert(
+        'Delete Failed',
+        error.response?.data?.message || error.message || 'Failed to delete account. Please try again.'
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -80,9 +85,9 @@ export default function ProfileScreen() {
                 />
                 <View className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
             </View>
-            <Text className="text-xl font-bold text-foreground mt-3">Jack Verner</Text>
+            <Text className="text-xl font-bold text-foreground mt-3">{user?.full_name || 'Guest User'}</Text>
             <Text className="text-secondary text-center px-10 text-sm mt-1">
-                Lorem ipsum dolor sit amet consectetur. Magna lacinia id faucibus erat.
+                {user?.role || 'Driver'}
             </Text>
         </View>
 
@@ -91,11 +96,11 @@ export default function ProfileScreen() {
             <Text className="text-lg font-bold text-gray-800 mb-4">Contact Information</Text>
             
             <View className="gap-4">
-                <InfoRow icon={<CreditCard size={20} color="#1D92ED" />} label="User ID:" value="23056" />
-                <InfoRow icon={<Phone size={20} color="#1D92ED" />} label="Phone Number:" value="01333223056" />
-                <InfoRow icon={<Mail size={20} color="#1D92ED" />} label="Email:" value="jack@gmail.com" />
-                <InfoRow icon={<Calendar size={20} color="#1D92ED" />} label="Joined Date:" value="21 Jan, 2025" />
-                <InfoRow icon={<Truck size={20} color="#1D92ED" />} label="Vehicle Number:" value="2132" />
+                <InfoRow icon={<CreditCard size={20} color="#1D92ED" />} label="User ID:" value={user?.user_id || 'N/A'} />
+                <InfoRow icon={<Phone size={20} color="#1D92ED" />} label="Phone Number:" value={user?.driver_profile?.phone_number || 'N/A'} />
+                <InfoRow icon={<Mail size={20} color="#1D92ED" />} label="Email:" value={user?.email_address || 'N/A'} />
+                <InfoRow icon={<Calendar size={20} color="#1D92ED" />} label="Joined Date:" value="N/A" />
+                <InfoRow icon={<Truck size={20} color="#1D92ED" />} label="Vehicle Number:" value={user?.driver_profile?.vehicle_number || 'N/A'} />
             </View>
         </View>
 

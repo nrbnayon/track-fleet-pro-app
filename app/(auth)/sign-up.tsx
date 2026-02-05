@@ -19,8 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useToastStore } from "@/store/useToastStore";
 
 export default function SignUpPage() {
+  const { showToast } = useToastStore();
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -71,6 +74,8 @@ export default function SignUpPage() {
     if (termsError) setTermsError("");
   };
 
+  const { signUp } = useAuthStore();
+  
   const handleSignUp = async () => {
     // Reset all errors
     setFullNameError("");
@@ -119,13 +124,44 @@ export default function SignUpPage() {
 
     try {
       setIsSubmitting(true);
-      console.log("Sign Up clicked", { fullName, email, password, agreeTerms });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Navigate to verification
-      router.push({ pathname: "/(auth)/verify-otp", params: { mode: "signup" } });
-    } catch (error) {
+      
+      const response = await signUp({
+        full_name: fullName.trim(),
+        email_address: email.trim(),
+        password,
+        business_name: "Delivery Man",
+        role: "DRIVER"
+      });
+
+      // Navigate to verification with userId from response
+      router.push({ 
+        pathname: "/(auth)/verify-otp", 
+        params: { 
+          mode: "signup", 
+          userId: response.user_id,
+          email: email.trim()
+        } 
+      });
+      
+      showToast("Account created successfully! Please verify your email.", "success");
+      
+    } catch (error: any) {
       console.error(error);
+      const errorMessage = error.response?.data?.message || error.message || "Signup failed";
+      
+      // If validation errors are present
+      if (error.response?.data?.errors) {
+          const errors = error.response.data.errors;
+          if (errors.email_address) setEmailError(errors.email_address);
+          if (errors.password) setPasswordError(errors.password);
+          if (errors.full_name) setFullNameError(errors.full_name);
+          
+          showToast(errorMessage, "error");
+      } else {
+          // generic error
+          setEmailError(errorMessage);
+          showToast(errorMessage, "error");
+      }
     } finally {
       setIsSubmitting(false);
     }

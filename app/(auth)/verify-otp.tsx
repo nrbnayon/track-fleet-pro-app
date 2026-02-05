@@ -7,26 +7,75 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { router, useLocalSearchParams } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useToastStore } from "@/store/useToastStore";
 
 export default function VerifyOTPPage() {
-  const { mode } = useLocalSearchParams<{ mode: string }>();
+  const { mode, userId, email } = useLocalSearchParams<{ mode: string; userId: string; email: string }>();
   const [otp, setOtp] = useState(["", "", "", ""]);
   const inputs = useRef<(TextInput | null)[]>([]);
+  const { showToast } = useToastStore();
+  const { verifyEmail, verifyResetCode, resendOTP, isLoading } = useAuthStore();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     const code = otp.join("");
-    console.log("Verify clicked", { code, mode });
+    if (code.length !== 4) {
+        showToast("Please enter the full 4-digit code", "error");
+        return;
+    }
+    
+    try {
+        setIsVerifying(true);
+        if (mode === "signup") {
+            await verifyEmail(userId, code);
+            showToast("Email verified successfully!", "success");
+        } else {
+            const data = await verifyResetCode(userId, code);
+            showToast("Code verified successfully!", "success");
+            router.push({
+                pathname: "/(auth)/reset-password",
+                params: {
+                    userId,
+                    secretKey: data.secret_key
+                }
+            });
+        }
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.message || "Invalid code";
+        showToast(errorMessage, "error");
+    } finally {
+        setIsVerifying(false);
+    }
+  };
 
-    if (mode === "signup") {
-      router.push({ pathname: "/(auth)/success", params: { mode: "signup" } });
-    } else {
-      router.push("/(auth)/reset-password");
+  const handleResendOTP = async () => {
+    if (!email) {
+      showToast("Email not found. Please try again.", "error");
+      return;
+    }
+
+    try {
+      setIsResending(true);
+      await resendOTP(email);
+      showToast("OTP resent successfully! Please check your email.", "success");
+      // Clear the OTP inputs
+      setOtp(["", "", "", ""]);
+      inputs.current[0]?.focus();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || "Failed to resend OTP";
+      showToast(errorMessage, "error");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -69,7 +118,7 @@ export default function VerifyOTPPage() {
       >
         <View className="flex-1 items-center justify-center px-5">
           <View className="w-full max-w-md">
-            <View className="items-center gap-3 mb-14">
+            <View className="items-center gap-3 mb-10">
               <Image
                 source={require("@/assets/icons/logo.png")}
                 className="w-20 h-10"
@@ -79,11 +128,11 @@ export default function VerifyOTPPage() {
                 Enter OTP
               </Text>
               <Text className="text-sm text-secondary text-center leading-5 px-8">
-                we sent a 4 code to your email dani********.com
+                We sent a 4-digit code to your email {email ? email : ''}
               </Text>
             </View>
 
-            <View className="flex-row justify-center gap-4 mb-14">
+            <View className="flex-row justify-center gap-4 mb-10">
               {otp.map((digit, index) => (
                 <TextInput
                   key={index}
@@ -95,10 +144,10 @@ export default function VerifyOTPPage() {
                   onKeyPress={(e) => handleKeyPress(e, index)}
                   keyboardType="number-pad"
                   maxLength={1}
-                  className={`w-[60px] h-[60px] rounded-[15px] border-2 text-center text-2xl font-bold ${
+                  className={`w-[55px] h-[55px] rounded-[10px] border-2 text-center text-xl font-bold ${
                     digit
                       ? "border-primary text-black"
-                      : "border-primary text-black"
+                      : "border-gray-200 text-black"
                   } bg-white`}
                   style={{ lineHeight: 28 }}
                 />
@@ -107,13 +156,22 @@ export default function VerifyOTPPage() {
 
             <View className="flex-row justify-center mb-8">
               <Text className="text-secondary">Didn&lsquo;t get OTP? </Text>
-              <Pressable onPress={() => console.log("Resend OTP")}>
-                <Text className="text-primary font-bold">Resend</Text>
+              <Pressable onPress={handleResendOTP} disabled={isResending}>
+                <Text className={`font-bold ${isResending ? 'text-gray-400' : 'text-primary'}`}>
+                  {isResending ? 'Resending...' : 'Resend'}
+                </Text>
               </Pressable>
             </View>
 
-            <Button onPress={handleVerify} className="w-full">
-              Verify
+            <Button onPress={handleVerify} className="w-full" disabled={isVerifying}>
+              {isVerifying ? (
+                  <View className="flex-row items-center justify-center gap-2">
+                      <ActivityIndicator color="white" />
+                      <Text className="text-white font-medium">Verifying...</Text>
+                  </View>
+              ) : (
+                  "Verify"
+              )}
             </Button>
           </View>
         </View>

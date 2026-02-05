@@ -16,7 +16,7 @@ import { EmergencyButton } from '@/components/ui/EmergencyButton';
 import { ParcelCardSkeleton } from '@/components/ui/SkeletonCard';
 
 export default function HomeScreen() {
-  const { user, signOut } = useAuthStore();
+  const { user } = useAuthStore();
   const {
     fetchParcels,
     activeTab,
@@ -41,10 +41,6 @@ export default function HomeScreen() {
     await fetchParcels();
     setRefreshing(false);
   };
-
-  // const handleLogout = async () => {
-  //   await signOut();
-  // };
 
   const handleEmergencyAlert = () => {
     setShowEmergencyModal(true);
@@ -75,7 +71,7 @@ export default function HomeScreen() {
         <View className="flex-row justify-between items-start mb-6 mt-4">
           <View>
             <Text className="text-2xl font-bold text-gray-900">
-              Hello, {user?.name || 'Driver'}
+              Hello, {user?.full_name || 'Driver'}
             </Text>
             <View className="flex-row items-center mt-1">
               <MapPin size={14} color="#414141" />

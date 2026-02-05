@@ -18,8 +18,11 @@ import { router } from "expo-router";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useToastStore } from "@/store/useToastStore";
 
 export default function ForgotPasswordPage() {
+  const { showToast } = useToastStore();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +41,8 @@ export default function ForgotPasswordPage() {
     }
   };
 
+  const { forgotPassword } = useAuthStore();
+
   const handleResetPassword = async () => {
     // Reset error
     setEmailError("");
@@ -55,14 +60,31 @@ export default function ForgotPasswordPage() {
 
     try {
       setIsSubmitting(true);
-      console.log("Reset Password clicked", { email: email.trim() });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Navigate to OTP verification
-      router.push({ pathname: "/(auth)/verify-otp", params: { mode: "reset" } });
-    } catch (error) {
+      
+      const response = await forgotPassword(email.trim());
+      
+      showToast("Verification code sent to your email", "success");
+
+      // Navigate to OTP verification with userId
+      router.push({ 
+        pathname: "/(auth)/verify-otp", 
+        params: { 
+          mode: "reset",
+          userId: response.user_id,
+          email: email.trim()
+        } 
+      });
+    } catch (error: any) {
       console.error(error);
-      setEmailError("Failed to send reset code. Please try again.");
+      const errorMessage = error.response?.data?.message || error.message || "Failed to send reset code";
+      
+      if (error.response?.data?.errors?.email_address) {
+          setEmailError(error.response.data.errors.email_address);
+      } else {
+          setEmailError(errorMessage);
+      }
+      
+      showToast(errorMessage, "error");
     } finally {
       setIsSubmitting(false);
     }

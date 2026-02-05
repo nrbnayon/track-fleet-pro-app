@@ -10,16 +10,21 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { EyeOff, Eye, ArrowLeft } from "lucide-react-native";
 import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ResetPasswordPage() {
+  const { userId, secretKey } = useLocalSearchParams<{ userId: string; secretKey: string }>();
+  const { resetPassword } = useAuthStore();
+  
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,44 +39,28 @@ export default function ResetPasswordPage() {
   const validatePassword = (password: string): boolean => {
     return password.length >= 6;
   };
+  
+  // ... password validation logic ...
 
-  // Validate password strength (optional - can be enhanced)
   const validatePasswordStrength = (password: string): string | null => {
     if (password.length < 6) {
       return "Password must be at least 6 characters";
     }
-    if (password.length < 8) {
-      return "Password should be at least 8 characters for better security";
-    }
-    // Check for at least one number
-    if (!/\d/.test(password)) {
-      return "Password should contain at least one number";
-    }
-    // Check for at least one letter
-    if (!/[a-zA-Z]/.test(password)) {
-      return "Password should contain at least one letter";
-    }
     return null;
   };
 
-  // Handle password change with error clearing
+  // ... event handlers ...
   const handlePasswordChange = (text: string) => {
     setPassword(text);
-    if (passwordError) {
-      setPasswordError("");
-    }
-    // Also clear confirm password error if they previously didn't match
+    if (passwordError) setPasswordError("");
     if (confirmPasswordError && confirmPassword && text === confirmPassword) {
       setConfirmPasswordError("");
     }
   };
 
-  // Handle confirm password change with error clearing
   const handleConfirmPasswordChange = (text: string) => {
     setConfirmPassword(text);
-    if (confirmPasswordError) {
-      setConfirmPasswordError("");
-    }
+    if (confirmPasswordError) setConfirmPasswordError("");
   };
 
   const handleReset = async () => {
@@ -105,17 +94,24 @@ export default function ResetPasswordPage() {
     if (hasError) {
       return;
     }
+    
+    if (!userId || !secretKey) {
+        Alert.alert("Error", "Missing verification details. Please start over.");
+        router.push("/(auth)/forgot-password");
+        return;
+    }
 
     try {
       setIsSubmitting(true);
-      console.log("Reset Password Submit clicked", { password, confirmPassword });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Navigate to success page
-      router.replace("/(auth)/success");
-    } catch (error) {
+      await resetPassword(userId, secretKey, password, confirmPassword);
+      
+      Alert.alert("Success", "Password reset successful! Please login.", [
+          { text: "OK", onPress: () => router.push("/(auth)/login") }
+      ]);
+      
+    } catch (error: any) {
       console.error(error);
-      setPasswordError("Failed to reset password. Please try again.");
+      setPasswordError(error.message || "Failed to reset password. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
