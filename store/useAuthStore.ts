@@ -7,6 +7,7 @@ interface User {
   email_address?: string;
   full_name?: string;
   role: string;
+  account_type?: string | "DRIVER";
   driver_profile?: {
     first_name: string | null;
     last_name: string | null;

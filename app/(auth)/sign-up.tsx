@@ -130,7 +130,8 @@ export default function SignUpPage() {
         email_address: email.trim(),
         password,
         business_name: "Delivery Man",
-        role: "DRIVER"
+        role: "DRIVER",
+        account_type: "DRIVER"
       });
 
       // Navigate to verification with userId from response
