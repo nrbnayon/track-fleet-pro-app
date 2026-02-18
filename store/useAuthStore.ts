@@ -56,6 +56,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         console.log('Refresh token:', refresh_token);
         console.log('User ID:', user_id);
         console.log('Role:', role);
+
+        if (role !== "DRIVER") {
+          throw new Error("Access Denied: Only drivers can login.");
+        }
         
         if (!access_token) {
           throw new Error('No access token received from server');

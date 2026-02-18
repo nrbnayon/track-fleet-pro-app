@@ -107,8 +107,12 @@ export default function LoginPage() {
           // Also show generic toast
           showToast(errorMessage, "error");
       } else {
-          Alert.alert("Login Failed", errorMessage);
-          showToast(errorMessage, "error");
+        if (errorMessage.includes("Access Denied")) {
+           showToast("Only drivers can login.", "error");
+        } else {
+           Alert.alert("Login Failed", errorMessage);
+           showToast(errorMessage, "error");
+        }
       }
 
     } finally {
