@@ -1,32 +1,96 @@
-
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, Image, Platform, KeyboardAvoidingView, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Camera } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import { shadows } from '@/lib/shadows';
 import { Input } from '@/components/ui/input';
 import { useToastStore } from '@/store/useToastStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
-const USER_IMAGE = 'https://i.pravatar.cc/300';
+const USER_IMAGE_PLACEHOLDER = 'https://i.pravatar.cc/300';
 
 export default function AccountSettingsScreen() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState('Jack');
-  const [lastName, setLastName] = useState('Verner');
-  const [email, setEmail] = useState('jack@gmail.com');
-  const [phone, setPhone] = useState('01333223056');
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, updateProfile } = useAuthStore();
   const { showToast } = useToastStore();
 
-  const handleSave = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [vehicleNumber, setVehicleNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.driver_profile?.first_name || '');
+      setLastName(user.driver_profile?.last_name || '');
+      setEmail(user.email_address || '');
+      setPhone(user.driver_profile?.phone_number || '');
+      setVehicleNumber(user.driver_profile?.vehicle_number || '');
+      setAddress(user.address || ''); 
+    }
+  }, [user]);
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-        setIsLoading(false);
-        showToast("Profile updated successfully");
-        router.back();
-    }, 1500);
+
+    try {
+      const formData = new FormData();
+      
+      // Root level fields for User model
+      const fullName = `${firstName} ${lastName}`.trim();
+      formData.append('full_name', fullName);
+      formData.append('address', address);
+
+      // Nested fields for DriverProfile model using dot notation
+      formData.append('driver_profile.first_name', firstName);
+      formData.append('driver_profile.last_name', lastName);
+      formData.append('driver_profile.vehicle_number', vehicleNumber);
+      formData.append('driver_profile.phone_number', phone);
+      formData.append('driver_profile.address', address);
+
+      if (profileImage) {
+        const filename = profileImage.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename || '');
+        const type = match ? `image/${match[1]}` : `image`;
+
+        // Profile image is on the User model
+        // @ts-ignore
+        formData.append('profile_image', {
+          uri: profileImage,
+          name: filename || 'profile.jpg',
+          type,
+        });
+      }
+
+      await updateProfile(formData);
+      showToast("Profile updated successfully", "success");
+      router.back();
+    } catch (error: any) {
+      const msg = error.response?.data?.message || error.message || "Failed to update profile";
+      showToast(msg, "error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,16 +117,18 @@ export default function AccountSettingsScreen() {
                 <View className="flex-row items-center gap-4">
                     <View className="relative">
                         <Image 
-                            source={{ uri: USER_IMAGE }} 
-                            className="w-20 h-20 rounded-full"
+                            source={{ uri: profileImage || user?.profile_image || USER_IMAGE_PLACEHOLDER }} 
+                            className="w-20 h-20 rounded-full border border-gray-200"
                         />
-                        <Pressable className="absolute bottom-0 right-0 bg-white/80 p-1.5 rounded-full border border-primary">
+                        <Pressable onPress={pickImage} className="absolute bottom-0 right-0 bg-white/80 p-1.5 rounded-full border border-primary">
                             <Camera size={14} color="#1D92ED" />
                         </Pressable>
                     </View>
                     <View>
-                        <Text className="text-base text-gray-800 font-medium">Change profile picture</Text>
-                        <Text className="text-gray-400 text-sm">JPG, PNG max 5MB</Text>
+                        <Pressable onPress={pickImage}>
+                            <Text className="text-base text-gray-800 font-medium">Change profile picture</Text>
+                            <Text className="text-gray-400 text-sm">JPG, PNG max 5MB</Text>
+                        </Pressable>
                     </View>
                 </View>
             </View>
@@ -77,6 +143,7 @@ export default function AccountSettingsScreen() {
                         <Input 
                             value={firstName}
                             onChangeText={setFirstName}
+                            placeholder="First Name"
                             className="border border-gray-200 p-3 text-base text-foreground"
                         />
                     </View>
@@ -85,6 +152,7 @@ export default function AccountSettingsScreen() {
                         <Input 
                             value={lastName}
                             onChangeText={setLastName}
+                            placeholder="Last Name"
                             className="border border-gray-200 p-3 text-base text-foreground"
                         />
                     </View>
@@ -105,8 +173,29 @@ export default function AccountSettingsScreen() {
                      <Input 
                         value={phone}
                         onChangeText={setPhone}
+                        placeholder="Phone Number"
                         className="border border-gray-200 p-3 text-base text-foreground"
                         keyboardType="phone-pad"
+                    />
+                </View>
+
+                <View className="mb-4">
+                    <Text className="text-secondary mb-2 font-medium">Vehicle Number</Text>
+                     <Input 
+                        value={vehicleNumber}
+                        onChangeText={setVehicleNumber}
+                        placeholder="e.g. DHK-123456"
+                        className="border border-gray-200 p-3 text-base text-foreground"
+                    />
+                </View>
+
+                <View className="mb-4">
+                    <Text className="text-secondary mb-2 font-medium">Address</Text>
+                     <Input 
+                        value={address}
+                        onChangeText={setAddress}
+                        placeholder="Full Address"
+                        className="border border-gray-200 p-3 text-base text-foreground"
                     />
                 </View>
             </View>

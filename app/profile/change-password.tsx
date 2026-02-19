@@ -8,6 +8,8 @@ import { shadows } from '@/lib/shadows';
 import { Input } from '@/components/ui/input';
 import { useToastStore } from '@/store/useToastStore';
 
+import { useAuthStore } from '@/store/useAuthStore';
+
 export default function ChangePasswordScreen() {
   const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState('');
@@ -47,23 +49,34 @@ export default function ChangePasswordScreen() {
     return isValid;
   };
 
+  const { changePassword } = useAuthStore();
   const { showToast } = useToastStore();
 
   const handleChangePassword = async () => {
     if (!validate()) return;
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-        setIsLoading(false);
-        showToast("Password updated successfully");
+    
+    try {
+        await changePassword({
+            old_password: currentPassword,
+            new_password: newPassword,
+            confirm_password: confirmPassword
+        });
+        
+        showToast("Password updated successfully", "success");
         router.back();
         
         // Reset fields
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
-    }, 1500);
+    } catch (error: any) {
+        const msg = error.response?.data?.message || error.message || "Failed to update password";
+        showToast(msg, "error");
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (

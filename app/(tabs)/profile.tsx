@@ -19,7 +19,8 @@ import {
   Trash2,
   Bell,
   PackageCheck,
-  Lock
+  Lock,
+  MapPin
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { shadows } from '@/lib/shadows';
@@ -77,56 +78,65 @@ export default function ProfileScreen() {
         </View>
 
         {/* User Info */}
-        <View className="items-center mb-6">
+        <View className="items-center mb-3">
             <View className="relative">
                 <Image 
-                    source={{ uri: USER_IMAGE }} 
-                    className="w-24 h-24 rounded-full"
+                    source={{ uri: user?.profile_image || USER_IMAGE }} 
+                    className="w-24 h-24 rounded-full bg-gray-100 border border-gray-100"
                 />
                 <View className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
             </View>
             <Text className="text-xl font-bold text-foreground mt-3">{user?.full_name || 'Guest User'}</Text>
             <Text className="text-secondary text-center px-10 text-sm mt-1">
-                {user?.role || 'Driver'}
+                {user?.role || 'Driver'} • {user?.ratings ? `${user.ratings} ⭐` : 'No ratings yet'}
             </Text>
         </View>
-
-        {/* Contact Information Card */}
-        <View className="mx-5 mb-6 bg-white rounded-2xl p-5" style={shadows.card}>
-            <Text className="text-lg font-bold text-gray-800 mb-4">Contact Information</Text>
-            
-            <View className="gap-4">
-                <InfoRow icon={<CreditCard size={20} color="#1D92ED" />} label="User ID:" value={user?.user_id || 'N/A'} />
-                <InfoRow icon={<Phone size={20} color="#1D92ED" />} label="Phone Number:" value={user?.driver_profile?.phone_number || 'N/A'} />
-                <InfoRow icon={<Mail size={20} color="#1D92ED" />} label="Email:" value={user?.email_address || 'N/A'} />
-                <InfoRow icon={<Calendar size={20} color="#1D92ED" />} label="Joined Date:" value="N/A" />
-                <InfoRow icon={<Truck size={20} color="#1D92ED" />} label="Vehicle Number:" value={user?.driver_profile?.vehicle_number || 'N/A'} />
-            </View>
-        </View>
-
+              
         {/* Performance Stats */}
-        <View className="mx-5 bg-white rounded-2xl px-5 py-8 my-3" style={shadows.card}>
+        <View className="mx-5 bg-white rounded-2xl p-5 my-3" style={shadows.card}>
             <Text className="text-lg font-bold text-foreground mb-5">Performance Stats</Text>
                   <View className="flex-row gap-4">
                 <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs h-40" style={shadows.box}>
                     <View className="w-10 h-10 rounded-full bg-[#1E972C33] items-center justify-center mb-2">
                         <PackageCheck size={20} color="#1E972C" />
                     </View>
-                    <Text className="text-2xl font-bold text-foreground">234</Text>
+                    <Text className="text-2xl font-bold text-foreground">
+                        {user?.driver_profile?.total_delivery ?? 0}
+                    </Text>
                     <Text className="text-gray-500 text-center text-xs mt-1">Deliveries Completed</Text>
                 </View>
                 <View className="flex-1 bg-white rounded-2xl p-4 items-center justify-center shadow-xs h-40" style={shadows.box}>
                     <View className="w-10 h-10 rounded-full bg-[#1D92ED33] items-center justify-center mb-2">
                          <DeliveryTruckIcon />
                     </View>
-                    <Text className="text-2xl font-bold text-foreground">120</Text>
+                    <Text className="text-2xl font-bold text-foreground">
+                        {user?.driver_profile?.active_delivery ?? 0}
+                    </Text>
                     <Text className="text-gray-500 text-center text-xs mt-1">Ongoing Deliveries</Text>
                 </View>
             </View>
         </View>
 
+        {/* Contact Information Card */}
+        <View className="mx-5 my-3 bg-white rounded-2xl p-5" style={shadows.card}>
+            <Text className="text-lg font-bold text-gray-800 mb-4">Contact Information</Text>
+            
+            <View className="gap-4">
+                <InfoRow icon={<CreditCard size={20} color="#1D92ED" />} label="User ID:" value={user?.user_id?.substring(0, 8) || 'N/A'} />
+                <InfoRow icon={<Phone size={20} color="#1D92ED" />} label="Phone:" value={user?.driver_profile?.phone_number || 'N/A'} />
+                <InfoRow icon={<Mail size={20} color="#1D92ED" />} label="Email:" value={user?.email_address || 'N/A'} />
+                <InfoRow icon={<MapPin size={20} color="#1D92ED" />} label="Address:" value={user?.address || 'N/A'} />
+                <InfoRow 
+                    icon={<Calendar size={20} color="#1D92ED" />} 
+                    label="Joined Date:" 
+                    value={user?.driver_profile?.created_at ? new Date(user.driver_profile.created_at).toLocaleDateString() : 'N/A'} 
+                />
+                <InfoRow icon={<Truck size={20} color="#1D92ED" />} label="Vehicle Number:" value={user?.driver_profile?.vehicle_number || 'N/A'} />
+            </View>
+        </View>
+
         {/* Settings */}
-        <View className="mx-5 mb-10 bg-white rounded-2xl px-5 py-8 mt-5" style={shadows.card}>
+        <View className="mx-5 mb-10 bg-white rounded-2xl p-5 mt-5" style={shadows.card}>
             <Text className="text-lg font-bold text-gray-800 mb-5">Settings</Text>
             
             <View className="gap-2">
@@ -135,13 +145,13 @@ export default function ProfileScreen() {
                     label="Account Settings" 
                     onPress={() => router.push('/profile/account')}
                       />
-                <SettingItem 
+                {/* <SettingItem 
                     icon={<FileText size={22} color="#414141" />} 
                     label="Documents" 
                     onPress={() => router.push('/profile/documents' as any)}
-                />
+                /> */}
                 
-                <View className="flex-row items-center py-3">
+                {/* <View className="flex-row items-center py-3">
                     <View className="w-8 items-center mr-3">
                          <View className="w-6 h-6 items-center justify-center">
                             <Clock size={22} color="#414141" />
@@ -154,7 +164,7 @@ export default function ProfileScreen() {
                         trackColor={{ false: '#767577', true: '#1D92ED' }}
                         thumbColor={'#fff'}
                     />
-                </View>
+                </View> */}
 
                 {/* Notifications Link - Navigates to app/notifications.tsx if it exists, or just placeholder */}
                 <SettingItem 

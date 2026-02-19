@@ -119,3 +119,217 @@ This project is private and proprietary. All rights reserved.
 <p align="center">
   Built with ❤️ for TrackFleet Pro Drivers
 </p>
+
+
+
+{
+    "success": true,
+    "status": 200,
+    "message": "Assigned parcels retrieved.",
+    "data": {
+        "success": true,
+        "status": 200,
+        "message": "Data retrieved successfully",
+        "count": 2,
+        "total_pages": 2,
+        "current_page": 1,
+        "next": "http://localhost:8002/api/parcel/driver/all-parcels/?page=2&page_size=1&status=DELIVERED",
+        "previous": null,
+        "data": [
+            {
+                "id": 67,
+                "tracking_id": "TRK305761509",
+                "title": "Docs 1",
+                "status": "DELIVERED",
+                "estimated_delivary_date": "2026-02-24T00:00:00Z",
+                "customer_name": "Mahedi 2",
+                "customer_phone": "0193436656",
+                "customer_email": "mahedijvai950@gmail.com",
+                "vehicle_number": "dhaka-121215",
+                "pickup_location": "48 Bir Uttam AK Khandakar Road, Dhaka 1212, Bangladesh",
+                "delivery_location": "Mirpur, Bangladesh",
+                "parcel_weight": 20.0,
+                "parcel_type": "Docs 1",
+                "special_instructions": "Deliver carefully",
+                "appoximate_distance": "15.2 km",
+                "pickup_coordinates": {
+                    "lat": 23.780664,
+                    "lng": 90.407492
+                },
+                "delivery_coordinates": {
+                    "lat": 23.797911,
+                    "lng": 90.449581
+                },
+                "driver": {
+                    "id": "54f934e4-05b3-4738-94d3-7af5a274c1bc",
+                    "full_name": "Rahim Store",
+                    "phone_number": "018935052***",
+                    "vehicle_number": "dhaka-121215",
+                    "profile_image": "/profiles-images/360_F_539775570_UHCPOMEjIV0xnwkaMRyHoy6pbFJ78IsY.jpg",
+                    "lat": 23.7808,
+                    "lng": 94.4068,
+                    "current_location": "Mohakhali, Dhaka"
+                },
+                "seller": {
+                    "Full_name": "Rahim Store 2",
+                    "phone_number": "01711223341"
+                }
+            }
+        ]
+    }
+}
+
+
+1.Driver home page get all parcel:
+For assigned tabs:get: {{base_url}}/api/parcel/driver/all-parcels/?page=1&page_size=10&status=PENDING&ACCEPTED 
+
+Header with bearer token
+
+Get response: 
+{
+    "success": true,
+    "status": 200,
+    "message": "Accepted/Pending requests retrieved.",
+    "data": {
+        "success": true,
+        "status": 200,
+        "message": "Data retrieved successfully",
+        "count": 3,
+        "total_pages": 1,
+        "current_page": 1,
+        "next": null,
+        "previous": null,
+        "data": [
+            {
+                "id": 68,
+                "tracking_id": "TRK984698980",
+                "title": "Documant",
+                "status": "PENDING",
+                "estimated_delivary_date": null,
+                "customer_name": "mahedi hasan",
+                "customer_phone": "52451210",
+                "customer_email": "mahedi.dev2002@gmail.com",
+                "vehicle_number": "Not Updated vehicle number",
+                "pickup_location": "Dhaka,Bangladesh",
+                "delivery_location": "Jamalpur,Bangladesh",
+                "parcel_weight": 5.0,
+                "parcel_type": "Documants",
+                "special_instructions": "Carefully deliver",
+                "appoximate_distance": null,
+                "pickup_coordinates": {
+                    "lat": 24.1245,
+                    "lng": 90.3654
+                },
+                "delivery_coordinates": {
+                    "lat": 24.2278,
+                    "lng": 90.4578
+                },
+                "driver": null,
+                "seller": {
+                    "Full_name": "Mahedi Hasan Noyon",
+                    "phone_number": "015254541122"
+                }
+            },
+            {
+                "id": 66,
+                "tracking_id": "TRK146152363",
+                "title": "Docs 1",
+                "status": "ASSIGNED",
+                "estimated_delivary_date": "2026-02-24T00:00:00Z",
+                "customer_name": "Mahedi",
+                "customer_phone": "0193436656",
+                "customer_email": "mahedijvai950@gmail.com",
+                "vehicle_number": "dhaka-121215",
+                "pickup_location": "48 Bir Uttam AK Khandakar Road, Dhaka 1212, Bangladesh",
+                "delivery_location": "QCXX+5V2, Dhaka, Bangladesh",
+                "parcel_weight": 20.0,
+                "parcel_type": "Docs 1",
+                "special_instructions": "Deliver carefully",
+                "appoximate_distance": "15.2 km",
+                "pickup_coordinates": {
+                    "lat": 23.780664,
+                    "lng": 90.407492
+                },
+                "delivery_coordinates": {
+                    "lat": 23.797911,
+                    "lng": 90.449581
+                },
+                "driver": {
+                    "id": "54f934e4-05b3-4738-94d3-7af5a274c1bc",
+                    "full_name": "Rahim Store",
+                    "phone_number": "018935052***",
+                    "vehicle_number": "dhaka-121215",
+                    "profile_image": "/profiles-images/360_F_539775570_UHCPOMEjIV0xnwkaMRyHoy6pbFJ78IsY.jpg",
+                    "lat": 23.7808,
+                    "lng": 94.4068,
+                    "current_location": "Mohakhali, Dhaka"
+                },
+                "seller": {
+                    "Full_name": "Rahim Store 2",
+                    "phone_number": "01711223341"
+                }
+            },
+            {
+                "id": 65,
+                "tracking_id": "TRK943880142",
+                "title": "Docs 1",
+                "status": "ASSIGNED",
+                "estimated_delivary_date": "2026-02-24T00:00:00Z",
+                "customer_name": "Mahedi",
+                "customer_phone": "0193436656",
+                "customer_email": "mahedijvai950@gmail.com",
+                "vehicle_number": "dhaka-121215",
+                "pickup_location": "48 Bir Uttam AK Khandakar Road, Dhaka 1212, Bangladesh",
+                "delivery_location": "QCXX+5V2, Dhaka, Bangladesh",
+                "parcel_weight": 20.0,
+                "parcel_type": "Docs 1",
+                "special_instructions": "Deliver carefully",
+                "appoximate_distance": "15.2 km",
+                "pickup_coordinates": {
+                    "lat": 23.780664,
+                    "lng": 90.407492
+                },
+                "delivery_coordinates": {
+                    "lat": 23.797911,
+                    "lng": 90.449581
+                },
+                "driver": {
+                    "id": "54f934e4-05b3-4738-94d3-7af5a274c1bc",
+                    "full_name": "Rahim Store",
+                    "phone_number": "018935052***",
+                    "vehicle_number": "dhaka-121215",
+                    "profile_image": "/profiles-images/360_F_539775570_UHCPOMEjIV0xnwkaMRyHoy6pbFJ78IsY.jpg",
+                    "lat": 23.7808,
+                    "lng": 94.4068,
+                    "current_location": "Mohakhali, Dhaka"
+                },
+                "seller": {
+                    "Full_name": "Rahim Store 2",
+                    "phone_number": "01711223341"
+                }
+            }
+        ]
+    }
+}
+
+Here will come both status data PENDING and ASSIGNED (accepted) 
+Now here need to show dynamic button in home page ParcelCard.tsx When Status pending show two button Reject and Accept when Assigned then show Start Trip 
+when click the targeted button it api action will be done and go to the its details page, Reject with confirmation modal
+
+---------------
+For Ongoing Tab api get: {{base_url}}/api/parcel/driver/all-parcels/?page=1&page_size=10&status=ONGOING
+
+response data structure same as above
+
+For Completed: {{base_url}}/api/parcel/driver/all-parcels/?page=1&page_size=10&status=DELIVERED
+response data structure same as above
+
+------------------------
+Getting a single parcel details by by parcel id
+
+
+------------------------------------
+
+
+
+

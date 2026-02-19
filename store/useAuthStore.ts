@@ -8,16 +8,36 @@ interface User {
   full_name?: string;
   role: string;
   account_type?: string | "DRIVER";
+  address?: string | null;
+  profile_image?: string | null;
+  ratings?: number;
   driver_profile?: {
     first_name: string | null;
     last_name: string | null;
     vehicle_number: string | null;
     phone_number: string;
+    profile_image?: string | null;
+    total_delivery?: number;
+    active_delivery?: number;
+    created_at?: string;
   };
+}
+
+interface Admin {
+  id: string;
+  full_name: string;
+  phone_number: string;
+  email_address: string;
+  address: string;
+  profile_image: string | null;
+  role: string;
+  is_verified: boolean;
+  is_staff: boolean;
 }
 
 interface AuthState {
   user: User | null;
+  admin: Admin | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   
@@ -27,15 +47,19 @@ interface AuthState {
   forgotPassword: (email: string) => Promise<{ user_id: string }>;
   verifyResetCode: (userId: string, code: string) => Promise<{ secret_key: string }>;
   resetPassword: (userId: string, secretKey: string, newPassword: string, confirmPassword: string) => Promise<void>;
+  changePassword: (data: any) => Promise<void>;
+  updateProfile: (data: FormData) => Promise<void>;
   resendOTP: (email: string) => Promise<void>;
   deleteAccount: () => Promise<void>;
   getProfile: () => Promise<void>;
+  getAdminDetails: () => Promise<void>;
   signOut: () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  admin: null,
   isAuthenticated: false,
   isLoading: true,
 
@@ -226,6 +250,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  getAdminDetails: async () => {
+    try {
+      const response = await api.get('/api/auth/admin/details/');
+      if (response.data) {
+        set({ admin: response.data });
+      }
+    } catch (error) {
+      console.error('Get admin details error:', error);
+    }
+  },
+
   signOut: async () => {
     try {
       await SecureStore.deleteItemAsync('access_token');
@@ -259,6 +294,42 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isAuthenticated: false });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  changePassword: async (data) => {
+    try {
+      const response = await api.patch('/api/auth/change-password/', data);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      throw error;
+    }
+  },
+
+  updateProfile: async (formData) => {
+    try {
+      const response = await api.put('/api/auth/getme/', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+          // The API returns success structure, data contains the user object
+          set((state) => ({
+              user: {
+                  ...state.user,
+                  ...response.data.data
+              }
+          }));
+      }
+    } catch (error) {
+        console.error('Update profile error:', error);
+        throw error;
     }
   }
 }));
