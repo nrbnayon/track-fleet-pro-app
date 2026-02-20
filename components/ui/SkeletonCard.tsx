@@ -310,3 +310,68 @@ export const ParcelDetailSkeleton = () => {
     </View>
   );
 };
+
+// ─── Notification list row skeleton ──────────────────────────────────────────
+export const NotificationRowSkeleton = () => {
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(shimmerAnim, {
+        toValue: 1,
+        duration: 1400,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  const translateX = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-300, 300],
+  });
+
+  const bg = '#E5E7EB';
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        backgroundColor: 'white',
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Icon circle */}
+      <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: bg, marginRight: 12, marginTop: 2 }} />
+
+      {/* Text lines */}
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <View style={{ height: 13, width: '80%', borderRadius: 6, backgroundColor: bg, marginBottom: 8 }} />
+        <View style={{ height: 11, width: '55%', borderRadius: 6, backgroundColor: bg }} />
+      </View>
+
+      {/* Unread dot placeholder */}
+      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: bg, marginTop: 6, marginLeft: 8 }} />
+
+      {/* Shimmer sweep */}
+      <Animated.View
+        style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          transform: [{ translateX }],
+        }}
+      >
+        <LinearGradient
+          colors={['transparent', 'rgba(255,255,255,0.45)', 'transparent']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{ flex: 1, width: 300 }}
+        />
+      </Animated.View>
+    </View>
+  );
+};

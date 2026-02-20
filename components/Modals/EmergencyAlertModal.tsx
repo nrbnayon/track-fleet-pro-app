@@ -1,9 +1,12 @@
 
 import React, { useState } from 'react';
-import { View, Text, Modal, Pressable, TextInput, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Modal, Pressable, TextInput, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { X, AlertTriangle, ArrowLeft } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { useParcelStore } from '@/store/useParcelStore';
+import { useToastStore } from '@/store/useToastStore';
 
 interface EmergencyAlertModalProps {
   visible: boolean;
@@ -11,14 +14,16 @@ interface EmergencyAlertModalProps {
 }
 
 const ISSUES = [
-  'Vehicle Breakdown',
-  'Accident',
-  'Health Emergency',
-  'Safety Threat',
-  'Other'
+  { label: 'Vehicle Breakdown', value: 'VEHICLE_BREAKDOWN' },
+  { label: 'Accident', value: 'ACCIDENT' },
+  { label: 'Health Emergency', value: 'HEALTH_EMERGENCY' },
+  { label: 'Safety Threat', value: 'SAFETY_THREAT' },
+  { label: 'Other', value: 'OTHER' }
 ];
 
 export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visible, onClose }) => {
+  const { sendEmergencyAlert, actionLoading } = useParcelStore();
+  const { showToast } = useToastStore();
   const [selectedIssue, setSelectedIssue] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -30,12 +35,18 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
     }
   };
 
-  const handleConfirmSend = () => {
-    setShowConfirmModal(false);
-    // Simulate API call
-    setTimeout(() => {
+  const handleConfirmSend = async () => {
+    if (!selectedIssue) return;
+    
+    const success = await sendEmergencyAlert(selectedIssue, description || 'Emergency alert reported');
+    
+    if (success) {
+      setShowConfirmModal(false);
       setShowSuccessModal(true);
-    }, 500);
+    } else {
+      setShowConfirmModal(false);
+      showToast('Failed to send emergency alert. Please try again.', 'error');
+    }
   };
 
   const handleSuccessDismiss = () => {
@@ -68,18 +79,18 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
           <View className="gap-4 mb-6">
             {ISSUES.map((issue) => (
               <Pressable
-                key={issue}
-                onPress={() => setSelectedIssue(issue)}
+                key={issue.value}
+                onPress={() => setSelectedIssue(issue.value)}
                 className="flex-row items-center gap-3"
               >
                 <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
-                  selectedIssue === issue ? 'border-foreground' : 'border-foreground'
+                  selectedIssue === issue.value ? 'border-foreground' : 'border-foreground'
                 }`}>
-                  {selectedIssue === issue && (
+                  {selectedIssue === issue.value && (
                     <View className="w-3 h-3 rounded-full bg-foreground" />
                   )}
                 </View>
-                <Text className="text-gray-700 text-base">{issue}</Text>
+                <Text className="text-gray-700 text-base">{issue.label}</Text>
               </Pressable>
             ))}
           </View>
@@ -130,9 +141,14 @@ export const EmergencyAlertModal: React.FC<EmergencyAlertModalProps> = ({ visibl
                 </Pressable>
                 <Pressable
                   onPress={handleConfirmSend}
+                  disabled={actionLoading}
                   className="flex-1 py-3 bg-red-600 rounded-full items-center"
                 >
-                  <Text className="text-white font-bold text-base">Send</Text>
+                  {actionLoading ? (
+                    <ActivityIndicator color="white" size="small" />
+                  ) : (
+                    <Text className="text-white font-bold text-base">Send</Text>
+                  )}
                 </Pressable>
               </View>
             </View>

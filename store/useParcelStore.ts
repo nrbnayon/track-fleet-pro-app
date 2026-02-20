@@ -94,6 +94,7 @@ interface ParcelState {
   rejectOrder: (id: number) => Promise<boolean>;
   startTrip: (id: number) => Promise<boolean>;
   markAsDelivered: (id: number) => Promise<boolean>;
+  sendEmergencyAlert: (issueType: string, description: string) => Promise<boolean>;
 }
 
 // Map tab names to API status query values
@@ -372,5 +373,20 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
         p.delivery_location?.toLowerCase().includes(q) ||
         p.customer_name?.toLowerCase().includes(q)
     );
+  },
+
+  sendEmergencyAlert: async (issueType, description) => {
+    set({ actionLoading: true });
+    try {
+      await api.post('/api/parcel/emergency-alert/', {
+        issue_type: issueType,
+        description: description,
+      });
+      set({ actionLoading: false });
+      return true;
+    } catch (err: any) {
+      set({ actionLoading: false });
+      return false;
+    }
   },
 }));
