@@ -32,7 +32,7 @@ const sendLocationUpdate = async (location: Location.LocationObject) => {
       console.log("Reverse geocoding failed:", e);
     }
 
-    console.log(`🚀 Sending location update: ${latitude}, ${longitude}, ${current_location}`);
+    // console.log(`🚀 Sending location update: ${latitude}, ${longitude}, ${current_location}`);
 
     await api.post('/api/admin/driver/update-location/', {
       lat: latitude,
@@ -42,7 +42,7 @@ const sendLocationUpdate = async (location: Location.LocationObject) => {
     
   } catch (error: any) {
     if (error.response?.status === 403) {
-      console.log("User is not a driver or not authorized.");
+      // console.log("User is not a driver or not authorized.");
     } else {
       console.error("Failed to send location update:", error.message);
     }
@@ -60,9 +60,9 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
     const loc = locations[0];
     
     // Log detailed background location information
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🔵 [Background Location Update]');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    // console.log('🔵 [Background Location Update]');
+    // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     
     // Send update to server
     await sendLocationUpdate(loc);
@@ -111,7 +111,7 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
             notificationColor: "#1D92ED",
           },
         });
-        console.log("Background location tracking started");
+        // console.log("Background location tracking started");
       }
     } catch (e: any) {
       console.log("Background location tracking failed to start (expected in Expo Go without Custom Dev Client):", e.message);
@@ -216,9 +216,9 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
           setLocation(currentLocation);
           sendLocationUpdate(currentLocation); // Send initial location
           
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('📍 [Initial Location]');
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          // console.log('📍 [Initial Location]');
+          // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
           // Start watching for continuous updates
           subscriber = await Location.watchPositionAsync(
@@ -227,9 +227,9 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
               setLocation(loc);
               sendLocationUpdate(loc); // Send location update
               
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.log('📍 [Foreground Location Update]');
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              // console.log('📍 [Foreground Location Update]');
+              // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
             }
           );
         } catch (e) {

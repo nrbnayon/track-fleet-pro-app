@@ -70,16 +70,16 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
       });
 
-      console.log('Full API Response:', JSON.stringify(response.data, null, 2));
+      // console.log('Full API Response:', JSON.stringify(response.data, null, 2));
 
       if (response.data.success) {
         const { access_token, refresh_token, user_id, role } = response.data.data;
         
-        console.log('Login successful, storing tokens...');
-        console.log('Access token:', access_token);
-        console.log('Refresh token:', refresh_token);
-        console.log('User ID:', user_id);
-        console.log('Role:', role);
+        // console.log('Login successful, storing tokens...');
+        // console.log('Access token:', access_token);
+        // console.log('Refresh token:', refresh_token);
+        // console.log('User ID:', user_id);
+        // console.log('Role:', role);
 
         if (role !== "DRIVER") {
           throw new Error("Access Denied: Only drivers can login.");
@@ -96,7 +96,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         
         // Verify tokens were stored
         const storedToken = await SecureStore.getItemAsync('access_token');
-        console.log('Stored token retrieved:', storedToken);
+        // console.log('Stored token retrieved:', storedToken);
         
         // Fetch full profile
         await useAuthStore.getState().getProfile();

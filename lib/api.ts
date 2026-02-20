@@ -14,8 +14,8 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const token = await SecureStore.getItemAsync('access_token');
-    console.log('Request interceptor - Token retrieved:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
-    console.log('Request URL:', config.url);
+    // console.log('Request interceptor - Token retrieved:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+    // console.log('Request URL:', config.url);
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
