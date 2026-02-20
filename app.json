@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icons/app-icon.png",
     "scheme": "trackfleetproapp",
-    "userInterfaceStyle": "light", //automatic, dark, light
+    "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -23,7 +23,7 @@
         "NSPhotoLibraryUsageDescription": "Track Fleet Pro needs access to your photo library to select existing photos for your profile picture.",
         "NSPhotoLibraryAddUsageDescription": "Track Fleet Pro needs access to save photos to your photo library."
       },
-      "bundleIdentifier": "com.trackfleetproapp.ltd" // for ios
+      "bundleIdentifier": "com.trackfleetproapp.ltd" 
     },
     "android": {
       "adaptiveIcon": {
