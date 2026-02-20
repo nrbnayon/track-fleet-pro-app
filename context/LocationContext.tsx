@@ -3,8 +3,51 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import { AppState, Linking, Platform, Alert } from 'react-native';
 import { LocationEmergencyAlertModal } from '@/components/Modals/LocationEmergencyAlertModal';
+import api from '@/lib/api';
 
 const LOCATION_TASK_NAME = 'background-location-task';
+
+// Helper function to send location update
+const sendLocationUpdate = async (location: Location.LocationObject) => {
+  try {
+    const { latitude, longitude } = location.coords;
+    
+    // Reverse geocode to get address
+    let current_location = "";
+    try {
+      const addresses = await Location.reverseGeocodeAsync({ latitude, longitude });
+      if (addresses && addresses.length > 0) {
+        const addr = addresses[0];
+        // Format: "Mohakhali, Dhaka"
+        const parts = [];
+        if (addr.district || addr.city) parts.push(addr.district || addr.city);
+        if (addr.region) parts.push(addr.region);
+        
+        current_location = parts.join(", ");
+        
+        // Fallback or more detail if available
+        if (!current_location && addr.name) current_location = addr.name;
+      }
+    } catch (e) {
+      console.log("Reverse geocoding failed:", e);
+    }
+
+    console.log(`🚀 Sending location update: ${latitude}, ${longitude}, ${current_location}`);
+
+    await api.post('/api/admin/driver/update-location/', {
+      lat: latitude,
+      lng: longitude,
+      current_location: current_location
+    });
+    
+  } catch (error: any) {
+    if (error.response?.status === 403) {
+      console.log("User is not a driver or not authorized.");
+    } else {
+      console.error("Failed to send location update:", error.message);
+    }
+  }
+};
 
 // Define the task in the global scope
 TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
@@ -15,21 +58,14 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
   if (data) {
     const { locations } = data as { locations: Location.LocationObject[] };
     const loc = locations[0];
+    
     // Log detailed background location information
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('🔵 [Background Location Update]');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🌍 Latitude:', loc.coords.latitude);
-    console.log('🌍 Longitude:', loc.coords.longitude);
-    console.log('🎯 Accuracy:', loc.coords.accuracy, 'meters');
-    console.log('⏱️  Timestamp:', new Date(loc.timestamp).toLocaleString());
-    if (loc.coords.altitude !== null) {
-      console.log('⛰️  Altitude:', loc.coords.altitude, 'meters');
-    }
-    if (loc.coords.speed !== null) {
-      console.log('🚗 Speed:', (loc.coords.speed * 3.6).toFixed(2), 'km/h');
-    }
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+    
+    // Send update to server
+    await sendLocationUpdate(loc);
   }
 });
 
@@ -178,41 +214,22 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
             accuracy: Location.Accuracy.High,
           });
           setLocation(currentLocation);
+          sendLocationUpdate(currentLocation); // Send initial location
+          
           console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           console.log('📍 [Initial Location]');
           console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('🌍 Latitude:', currentLocation.coords.latitude);
-          console.log('🌍 Longitude:', currentLocation.coords.longitude);
-          console.log('🎯 Accuracy:', currentLocation.coords.accuracy, 'meters');
-          console.log('⏱️  Timestamp:', new Date(currentLocation.timestamp).toLocaleString());
-          if (currentLocation.coords.altitude !== null) {
-            console.log('⛰️  Altitude:', currentLocation.coords.altitude, 'meters');
-          }
-          if (currentLocation.coords.speed !== null) {
-            console.log('🚗 Speed:', (currentLocation.coords.speed * 3.6).toFixed(2), 'km/h');
-          }
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
           // Start watching for continuous updates
           subscriber = await Location.watchPositionAsync(
-            { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
+            { accuracy: Location.Accuracy.High, timeInterval: 10000, distanceInterval: 50 },
             (loc) => {
               setLocation(loc);
-              // Log detailed location information
+              sendLocationUpdate(loc); // Send location update
+              
               console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
               console.log('📍 [Foreground Location Update]');
               console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-              console.log('🌍 Latitude:', loc.coords.latitude);
-              console.log('🌍 Longitude:', loc.coords.longitude);
-              console.log('🎯 Accuracy:', loc.coords.accuracy, 'meters');
-              console.log('⏱️  Timestamp:', new Date(loc.timestamp).toLocaleString());
-              if (loc.coords.altitude !== null) {
-                console.log('⛰️  Altitude:', loc.coords.altitude, 'meters');
-              }
-              if (loc.coords.speed !== null) {
-                console.log('🚗 Speed:', (loc.coords.speed * 3.6).toFixed(2), 'km/h');
-              }
-              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
             }
           );
         } catch (e) {
