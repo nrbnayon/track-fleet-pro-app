@@ -33,7 +33,6 @@ const USER_IMAGE = 'https://i.pravatar.cc/300';
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, signOut, deleteAccount } = useAuthStore();
-  const [isActive, setIsActive] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -58,7 +57,9 @@ export default function ProfileScreen() {
     } finally {
       setIsDeleting(false);
     }
-  };
+    };
+    
+    // console.log("Driver profile ::", user)
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
