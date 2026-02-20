@@ -1,12 +1,28 @@
-// app/[id].tsx
-import { View, Text, ScrollView, Pressable, Platform, Modal, Animated, Easing } from 'react-native';
+// app/parcel/[id].tsx
+import {
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+  Platform,
+  Modal,
+  Animated,
+  Easing,
+  ActivityIndicator,
+} from 'react-native';
+import { ParcelDetailSkeleton } from '@/components/ui/SkeletonCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ArrowLeft, MapPin, Phone, Truck, Info } from 'lucide-react-native';
 import { useState, useEffect, useRef } from 'react';
 import { useParcelStore } from '@/store/useParcelStore';
 import { useToastStore } from '@/store/useToastStore';
-import { TruckIcon, ParcelBoxIcon, DeliveredIcon, CheckCircleIcon } from '@/components/icons/DeliveryIcons';
+import {
+  TruckIcon,
+  ParcelBoxIcon,
+  DeliveredIcon,
+  CheckCircleIcon,
+} from '@/components/icons/DeliveryIcons';
 
 const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return 'N/A';
@@ -23,22 +39,26 @@ const formatDate = (dateString: string | null | undefined): string => {
 
 const getLocationName = (location: string | undefined): string => {
   if (!location) return 'Unknown';
-  const parts = location.split(',').filter(part => part.trim());
+  const parts = location.split(',').filter((part) => part.trim());
   if (parts.length === 0) return 'Unknown';
   if (parts.length === 1) return parts[0].trim();
-  // Get second-to-last part, or last part if only 2 parts
   const index = parts.length >= 2 ? parts.length - 2 : parts.length - 1;
   return parts[index].trim();
 };
 
-function RejectOrderModal({ visible, onClose, onConfirm }: { visible: boolean; onClose: () => void; onConfirm: () => void }) {
+function RejectOrderModal({
+  visible,
+  onClose,
+  onConfirm,
+  loading,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  loading: boolean;
+}) {
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal animationType="fade" transparent visible={visible} onRequestClose={onClose}>
       <View className="flex-1 justify-center items-center bg-black/50 px-5">
         <View className="bg-white rounded-3xl p-6 w-full max-w-sm items-center">
           <View className="w-12 h-12 rounded-full bg-red-100 items-center justify-center mb-4">
@@ -46,20 +66,26 @@ function RejectOrderModal({ visible, onClose, onConfirm }: { visible: boolean; o
           </View>
           <Text className="text-xl font-bold text-gray-900 mb-2">Reject Order</Text>
           <Text className="text-gray-500 text-center mb-6">
-            Are you sure you want to reject the order?
+            Are you sure you want to reject this order? This action cannot be undone.
           </Text>
           <View className="flex-row gap-3 w-full">
-            <Pressable 
+            <Pressable
               onPress={onClose}
+              disabled={loading}
               className="flex-1 py-3 rounded-full border border-gray-300 items-center"
             >
               <Text className="text-gray-700 font-semibold">Cancel</Text>
             </Pressable>
-            <Pressable 
+            <Pressable
               onPress={onConfirm}
+              disabled={loading}
               className="flex-1 py-3 rounded-full bg-red-600 items-center"
             >
-              <Text className="text-white font-semibold">Reject</Text>
+              {loading ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <Text className="text-white font-semibold">Reject</Text>
+              )}
             </Pressable>
           </View>
         </View>
@@ -69,19 +95,32 @@ function RejectOrderModal({ visible, onClose, onConfirm }: { visible: boolean; o
 }
 
 export default function ParcelDetailsScreen() {
-  const { id } = useLocalSearchParams();
-  const { parcels, startTrip, markAsDelivered, acceptOrder, rejectOrder } = useParcelStore();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const {
+    detailParcel,
+    detailLoading,
+    fetchParcelById,
+    acceptOrder,
+    rejectOrder,
+    startTrip,
+    markAsDelivered,
+  } = useParcelStore();
   const { showToast } = useToastStore();
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  
-  const parcel = parcels.find((p) => p.id === id);
 
-  const isPending = parcel?.parcel_status === 'pending';
-  const isOngoing = parcel?.parcel_status === 'ongoing';
-  const isDelivered = parcel?.parcel_status === 'delivered';
-  const isReturn = parcel?.parcel_status === 'return';
-  const isCancelled = parcel?.parcel_status === 'cancelled';
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (id) fetchParcelById(id);
+  }, [id]);
+
+  const parcel = detailParcel;
+
+  const isPending = parcel?.status === 'PENDING';
+  const isAssigned = parcel?.status === 'ASSIGNED';
+  const isOngoing = parcel?.status === 'ONGOING';
+  const isDelivered = parcel?.status === 'DELIVERED';
 
   useEffect(() => {
     if (isOngoing) {
@@ -101,9 +140,20 @@ export default function ParcelDetailsScreen() {
         ])
       ).start();
     } else {
-        animatedValue.setValue(0);
+      animatedValue.setValue(0);
     }
   }, [isOngoing]);
+
+  // ── Loading skeleton ──────────────────────────────────────────────────────
+  if (detailLoading) {
+    return (
+      <SafeAreaView
+        style={{ flex: 1, backgroundColor: 'white', paddingTop: Platform.OS === 'android' ? 5 : 0 }}
+      >
+        <ParcelDetailSkeleton />
+      </SafeAreaView>
+    );
+  }
 
   if (!parcel) {
     return (
@@ -116,62 +166,90 @@ export default function ParcelDetailsScreen() {
     );
   }
 
-  const handleStartTrip = () => {
-    startTrip(parcel.id);
-    showToast('Trip Started Successfully', 'success');
+  // ── Handlers ──────────────────────────────────────────────────────────────
+  const handleAccept = async () => {
+    setActionLoading('accept');
+    const success = await acceptOrder(parcel.id);
+    setActionLoading(null);
+    if (success) {
+      showToast('Order accepted successfully!', 'success');
+    } else {
+      showToast('Failed to accept. Please try again.', 'error');
+    }
   };
 
-  const handleMarkAsDelivered = () => {
-    markAsDelivered(parcel.id);
-    showToast('Parcel Marked as Delivered', 'success');
-  };
-
-  const handleAccept = () => {
-    acceptOrder(parcel.id);
-    showToast('Order Accepted', 'success');
-  };
-
-  const handleRejectConfirm = () => {
-    rejectOrder(parcel.id);
+  const handleRejectConfirm = async () => {
+    setActionLoading('reject');
+    const success = await rejectOrder(parcel.id);
+    setActionLoading(null);
     setShowRejectModal(false);
-    showToast('Order Rejected', 'success');
-    router.back();
+    if (success) {
+      showToast('Order rejected.', 'info');
+      router.back();
+    } else {
+      showToast('Failed to reject. Please try again.', 'error');
+    }
   };
 
+  const handleStartTrip = async () => {
+    setActionLoading('start');
+    const success = await startTrip(parcel.id);
+    setActionLoading(null);
+    if (success) {
+      showToast('Trip started! Parcel is now ongoing.', 'success');
+    } else {
+      showToast('Failed to start trip. Please try again.', 'error');
+    }
+  };
+
+  const handleMarkAsDelivered = async () => {
+    setActionLoading('deliver');
+    const success = await markAsDelivered(parcel.id);
+    setActionLoading(null);
+    if (success) {
+      showToast('Parcel marked as delivered! 🎉', 'success');
+    } else {
+      showToast('Failed to mark as delivered. Please try again.', 'error');
+    }
+  };
+
+  // ── Derived display values ────────────────────────────────────────────────
   const pickupLocationName = getLocationName(parcel.pickup_location);
   const deliveryLocationName = getLocationName(parcel.delivery_location);
-  const dispatchDate = formatDate(parcel.createdAt);
-  const deliveryDate = formatDate(parcel.actual_delivery || parcel.estimated_delivery);
+  const deliveryDate = formatDate(parcel.estimated_delivary_date);
+
+  const statusColor = isDelivered
+    ? { bg: 'bg-green-100', text: 'text-green-700' }
+    : isOngoing
+    ? { bg: 'bg-blue-100', text: 'text-blue-700' }
+    : isPending
+    ? { bg: 'bg-yellow-100', text: 'text-yellow-700' }
+    : { bg: 'bg-indigo-100', text: 'text-indigo-700' };
 
   const renderTimelineIcon = () => {
-    if (isPending) {
+    if (isPending || isAssigned) {
       return (
         <View className="absolute" style={{ left: '0%', top: -25, transform: [{ translateX: -15 }] }}>
           <ParcelBoxIcon />
         </View>
       );
     }
-    
+
     if (isOngoing) {
       const left = animatedValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0%', '100%'],
       });
-
       return (
-        <Animated.View 
-          className="absolute" 
-          style={{ 
-            left, 
-            top: -25, 
-            transform: [{ translateX: -15 }] 
-          }}
+        <Animated.View
+          className="absolute"
+          style={{ left, top: -25, transform: [{ translateX: -15 }] }}
         >
           <TruckIcon />
         </Animated.View>
       );
     }
-    
+
     if (isDelivered) {
       return (
         <View className="absolute" style={{ left: '100%', top: -25, transform: [{ translateX: -15 }] }}>
@@ -179,13 +257,16 @@ export default function ParcelDetailsScreen() {
         </View>
       );
     }
-    
-    // Return empty View instead of null to prevent Android crash
+
     return <View />;
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white" style={{ paddingTop: Platform.OS === 'android' ? 5 : 0 }}>
+    <SafeAreaView
+      className="flex-1 bg-white"
+      style={{ paddingTop: Platform.OS === 'android' ? 5 : 0 }}
+    >
+      {/* ── Top bar ── */}
       <View className="flex-row items-center justify-between px-5 py-4">
         <View className="flex-row items-center flex-1">
           <Pressable onPress={() => router.back()} className="mr-3 p-2 -ml-2">
@@ -193,45 +274,51 @@ export default function ParcelDetailsScreen() {
           </Pressable>
           <Text className="text-xl font-bold text-gray-900">Delivery Details</Text>
         </View>
-        <View className={`px-3 py-1 rounded-full ${isDelivered ? 'bg-green-100' : isOngoing ? 'bg-blue-100' : isPending ? 'bg-yellow-100' : 'bg-red-100'}`}>
-          <Text className={`text-xs font-semibold capitalize ${isDelivered ? 'text-green-700' : isOngoing ? 'text-blue-700' : isPending ? 'text-yellow-700' : 'text-red-700'}`}>
-            {parcel.parcel_status}
+        <View className={`px-3 py-1 rounded-full ${statusColor.bg}`}>
+          <Text className={`text-xs font-semibold ${statusColor.text}`}>
+            {parcel.status}
           </Text>
         </View>
       </View>
 
-      <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 100 }}>
-        
-        <View className="px-5 pt-2 pb-6">
-          <View className="flex-row items-center justify-between mb-1">
+      <ScrollView className="flex-1 bg-white" contentContainerStyle={{ paddingBottom: 120 }}>
+        {/* Tracking ID */}
+        <View className="px-5 pt-2 pb-4">
+          <View className="flex-row items-center justify-between">
             <Text className="text-sm text-secondary">Track ID:</Text>
-            <Text className="text-lg font-bold text-gray-900">{parcel.tracking_no || 'N/A'}</Text>
+            <Text className="text-lg font-bold text-gray-900">{parcel.tracking_id}</Text>
           </View>
         </View>
 
-        <View className="mx-5 mb-6 bg-white rounded-2xl p-6" 
+        {/* ── Journey card ── */}
+        <View
+          className="mx-5 mb-6 bg-white rounded-2xl p-6"
           style={{
             shadowColor: '#979393',
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 30,
             elevation: 8,
-          }}>
-          
+          }}
+        >
+          {/* Route header */}
           <View className="flex-row items-center justify-between mb-6">
             <View>
-              <Text className="text-xs text-secondary mb-1">{dispatchDate}</Text>
+              <Text className="text-xs text-secondary mb-1">Pickup</Text>
               <Text className="text-sm font-semibold text-gray-900">{pickupLocationName}</Text>
             </View>
             <View>
-              <Text className="text-xs text-secondary mb-1 text-right">{deliveryDate}</Text>
-              <Text className="text-sm font-semibold text-gray-900">{deliveryLocationName}</Text>
+              <Text className="text-xs text-secondary mb-1 text-right">Est. Delivery</Text>
+              <Text className="text-sm font-semibold text-gray-900 text-right">{deliveryDate}</Text>
             </View>
           </View>
 
+          {/* Animated progress line */}
           <View className="relative mb-8 mt-4">
-            <View className="absolute left-0 right-0 top-1/2 h-0.5 bg-blue-500" style={{ transform: [{ translateY: -1 }] }} />
-            
+            <View
+              className="absolute left-0 right-0 top-1/2 h-0.5 bg-blue-500"
+              style={{ transform: [{ translateY: -1 }] }}
+            />
             <View className="flex-row justify-between items-center">
               <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
               <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
@@ -239,64 +326,54 @@ export default function ParcelDetailsScreen() {
               <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
               <View className="w-3 h-3 rounded-full bg-blue-500 z-10" />
             </View>
-            
             {renderTimelineIcon()}
           </View>
 
+          {/* ── From (Seller info) ── */}
           <View className="mb-6">
-            <Text className="text-xs text-gray-500 mb-2">From</Text>
+            <Text className="text-xs text-gray-500 mb-2">From (Seller)</Text>
             <Text className="text-base font-bold text-gray-900 mb-3">
-              {parcel.senderInfo?.name || parcel.sellerInfo?.name || 'Unknown Sender'}
+              {parcel.seller?.Full_name || 'Unknown Seller'}
             </Text>
-            
             <View className="flex-row items-start mb-2">
               <MapPin size={16} color="#6B7280" style={{ marginTop: 2, marginRight: 8 }} />
-              <Text className="text-sm text-gray-700 flex-1">
-                {parcel.pickup_location || parcel.senderInfo?.address || 'Address not available'}
-              </Text>
+              <Text className="text-sm text-gray-700 flex-1">{parcel.pickup_location}</Text>
             </View>
-            
-            {(parcel.senderInfo?.phone || parcel.sellerInfo?.phone) && (
+            {parcel.seller?.phone_number && (
               <View className="flex-row items-center">
                 <Phone size={16} color="#6B7280" style={{ marginRight: 8 }} />
-                <Text className="text-sm text-gray-700">
-                  {parcel.senderInfo?.phone || parcel.sellerInfo?.phone}
-                </Text>
+                <Text className="text-sm text-gray-700">{parcel.seller.phone_number}</Text>
               </View>
             )}
           </View>
 
+          {/* ── To (Customer info) ── */}
           <View className="mb-6">
-            <Text className="text-xs text-gray-500 mb-2">To</Text>
-            <Text className="text-base font-bold text-gray-900 mb-3">
-              {parcel.receiverInfo?.name || 'Unknown Receiver'}
-            </Text>
-            
+            <Text className="text-xs text-gray-500 mb-2">To (Customer)</Text>
+            <Text className="text-base font-bold text-gray-900 mb-3">{parcel.customer_name}</Text>
             <View className="flex-row items-start mb-2">
               <MapPin size={16} color="#6B7280" style={{ marginTop: 2, marginRight: 8 }} />
-              <Text className="text-sm text-gray-700 flex-1">
-                {parcel.delivery_location || parcel.receiverInfo?.address || 'Address not available'}
-              </Text>
+              <Text className="text-sm text-gray-700 flex-1">{parcel.delivery_location}</Text>
             </View>
-            
-            {parcel.receiverInfo?.phone && (
-              <View className="flex-row items-center">
+            {parcel.customer_phone && (
+              <View className="flex-row items-center mb-1">
                 <Phone size={16} color="#6B7280" style={{ marginRight: 8 }} />
-                <Text className="text-sm text-gray-700">{parcel.receiverInfo.phone}</Text>
+                <Text className="text-sm text-gray-700">{parcel.customer_phone}</Text>
               </View>
             )}
           </View>
 
+          {/* ── Parcel meta ── */}
           <View className="flex-row justify-between border-t border-gray-100 pt-4 mb-4">
             <View className="flex-1">
-              <Text className="text-xs text-gray-500 mb-1">Date of dispatch</Text>
-              <Text className="text-sm font-semibold text-gray-900">{dispatchDate}</Text>
+              <Text className="text-xs text-gray-500 mb-1">Parcel Title</Text>
+              <Text className="text-sm font-semibold text-gray-900">{parcel.title || 'N/A'}</Text>
             </View>
             <View className="flex-1 items-end">
-              <Text className="text-xs text-gray-500 mb-1">
-                {isDelivered ? 'Date of delivery' : 'Estimated delivery'}
+              <Text className="text-xs text-gray-500 mb-1">Distance</Text>
+              <Text className="text-sm font-semibold text-gray-900">
+                {parcel.appoximate_distance || 'N/A'}
               </Text>
-              <Text className="text-sm font-semibold text-gray-900">{deliveryDate}</Text>
             </View>
           </View>
 
@@ -314,68 +391,92 @@ export default function ParcelDetailsScreen() {
               </Text>
             </View>
           </View>
-        </View>
 
+          {parcel.special_instructions && (
+            <View className="mt-4 pt-4 border-t border-gray-100">
+              <Text className="text-xs text-gray-500 mb-1">Special Instructions</Text>
+              <Text className="text-sm text-gray-700">{parcel.special_instructions}</Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
 
+      {/* ── Bottom action bar ── */}
       <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-5 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        {isPending && !parcel.isAccepted && (
+        {/* PENDING: Reject + Accept */}
+        {isPending && (
           <View className="flex-row gap-3">
-             <Pressable 
+            <Pressable
               onPress={() => setShowRejectModal(true)}
-              className="flex-1 bg-red-50 py-4 rounded-xl items-center"
+              disabled={!!actionLoading}
+              className="flex-1 bg-red-50 py-4 rounded-xl items-center border border-red-100 active:bg-red-100"
             >
               <Text className="text-red-500 font-bold text-lg">Reject</Text>
             </Pressable>
-            <Pressable 
+            <Pressable
               onPress={handleAccept}
-              className="flex-1 bg-green-600 py-4 rounded-xl items-center shadow-md active:bg-green-700"
+              disabled={!!actionLoading}
+              className="flex-1 bg-green-600 py-4 rounded-xl items-center active:bg-green-700"
             >
-              <Text className="text-white font-bold text-lg">Accept</Text>
+              {actionLoading === 'accept' ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text className="text-white font-bold text-lg">Accept</Text>
+              )}
             </Pressable>
           </View>
         )}
 
-        {isPending && parcel.isAccepted && (
-          <Pressable 
+        {/* ASSIGNED: Start Trip */}
+        {isAssigned && (
+          <Pressable
             onPress={handleStartTrip}
-            className="bg-blue-600 rounded-xl py-4 items-center shadow-md active:bg-blue-700"
+            disabled={!!actionLoading}
+            className="bg-blue-600 rounded-xl py-4 items-center active:bg-blue-700"
           >
-            <View className="flex-row items-center">
-              <Truck size={20} color="white" className="mr-2" />
-              <Text className="text-white font-bold text-lg">Start Trip</Text>
-            </View>
+            {actionLoading === 'start' ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <View className="flex-row items-center gap-2">
+                <Truck size={20} color="white" />
+                <Text className="text-white font-bold text-lg">Start Trip</Text>
+              </View>
+            )}
           </Pressable>
         )}
 
+        {/* ONGOING: Mark as Delivered */}
         {isOngoing && (
-          <Pressable 
+          <Pressable
             onPress={handleMarkAsDelivered}
-            className="bg-green-600 rounded-xl py-4 items-center shadow-md active:bg-green-700"
+            disabled={!!actionLoading}
+            className="bg-green-600 rounded-xl py-4 items-center active:bg-green-700"
           >
-            <View className="flex-row items-center">
-              <CheckCircleIcon />
-              <Text className="text-white font-bold text-lg ml-2">Mark as Delivered</Text>
-            </View>
+            {actionLoading === 'deliver' ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <View className="flex-row items-center gap-2">
+                <CheckCircleIcon />
+                <Text className="text-white font-bold text-lg">Mark as Delivered</Text>
+              </View>
+            )}
           </Pressable>
         )}
 
+        {/* DELIVERED: Completed state */}
         {isDelivered && (
           <View className="bg-gray-100 rounded-xl py-4 items-center">
-            <Text className="text-gray-500 font-bold text-lg">Completed</Text>
-          </View>
-        )}
-        
-        {(isReturn || isCancelled) && (
-          <View className="bg-red-50 rounded-xl py-4 items-center border border-red-100">
-            <Text className="text-red-500 font-bold text-lg capitalize">{parcel.parcel_status}</Text>
+            <Text className="text-gray-500 font-bold text-lg">✓ Completed</Text>
           </View>
         )}
       </View>
-      <RejectOrderModal 
-        visible={showRejectModal} 
+
+      {/* Reject confirmation modal */}
+      <RejectOrderModal
+        visible={showRejectModal}
         onClose={() => setShowRejectModal(false)}
         onConfirm={handleRejectConfirm}
+        loading={actionLoading === 'reject'}
       />
     </SafeAreaView>
   );
