@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, Switch, Modal, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, ScrollView, Pressable, Image, Switch, Modal, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
   ArrowLeft, 
@@ -32,10 +32,20 @@ const USER_IMAGE = 'https://i.pravatar.cc/300';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, signOut, deleteAccount } = useAuthStore();
+  const { user, signOut, deleteAccount, getProfile } = useAuthStore();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await getProfile();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [getProfile]);
 
   const handleLogout = async () => {
     setShowLogoutModal(false);
@@ -63,7 +73,17 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView 
+        contentContainerStyle={{ paddingBottom: 80 }}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            colors={['#1D92ED']} // Android
+            tintColor="#1D92ED" // iOS
+          />
+        }
+      >
         {/* Header */}
         <View className="px-5">
         <View className="flex-row items-center py-4 gap-4">

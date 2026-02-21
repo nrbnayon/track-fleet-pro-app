@@ -84,7 +84,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     }
   },
 
-  // ── Auto-refresh: silently poll page 1 every 15 minutes ────────────────────
+  // ── Auto-refresh: silently poll page 1 every 5 minutes ────────────────────
   startAutoRefresh: () => {
     const existing = get().autoRefreshInterval;
     if (existing) {
@@ -108,7 +108,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
       } catch {
         // silently ignore background refresh errors
       }
-    }, 15 * 60 * 1000); // 15 minutes
+    }, 5 * 60 * 1000); // 5 minutes
 
     set({ autoRefreshInterval: interval });
   },

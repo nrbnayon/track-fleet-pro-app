@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Image, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, ScrollView, Pressable, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Phone, Mail, CircleUserRound, MapPin, ShieldCheck } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -10,19 +10,27 @@ export default function ContactScreen() {
   const router = useRouter();
   const { admin, getAdminDetails } = useAuthStore();
   const [loading, setLoading] = useState(!admin);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchAdmin = useCallback(async () => {
+    try {
+      await getAdminDetails();
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [getAdminDetails]);
 
   useEffect(() => {
-    const fetchAdmin = async () => {
-      try {
-        await getAdminDetails();
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchAdmin();
-  }, []);
+  }, [fetchAdmin]);
 
-  if (loading) {
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchAdmin();
+  }, [fetchAdmin]);
+
+  if (loading && !refreshing) {
     return (
       <View className="flex-1 bg-white justify-center items-center">
         <ActivityIndicator size="large" color="#1D92ED" />
@@ -32,7 +40,17 @@ export default function ContactScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-white" edges={['top']}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView 
+        contentContainerStyle={{ paddingBottom: 80 }}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            colors={['#1D92ED']} // Android
+            tintColor="#1D92ED" // iOS
+          />
+        }
+      >
         {/* Header */}
         <View className="px-5">
           <View className="flex-row items-center py-4 gap-4">

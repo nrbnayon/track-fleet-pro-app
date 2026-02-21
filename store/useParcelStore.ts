@@ -217,7 +217,7 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
     }
   },
 
-  // ── Auto-refresh: poll Assigned tab every 25 minutes ─────────────────────────
+  // ── Auto-refresh: poll Assigned tab every 5 minutes ─────────────────────────
   startAutoRefresh: () => {
     const { autoRefreshInterval, stopAutoRefresh } = get();
     if (autoRefreshInterval) stopAutoRefresh(); // clear existing
@@ -229,7 +229,7 @@ export const useParcelStore = create<ParcelState>((set, get) => ({
       if (parcels) {
         set({ assignedParcels: parcels, assignedMeta: meta! });
       }
-    }, 25 * 60 * 1000); // 25 minutes
+    }, 5 * 60 * 1000); // 5 minutes
 
     set({ autoRefreshInterval: interval });
   },
